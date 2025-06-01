@@ -1,0 +1,78 @@
+\documentclass[oneside]{book}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[colorlinks=true, linkcolor=blue, urlcolor=blue, citecolor=blue]{hyperref}
+\usepackage{graphicx}
+\usepackage{import}
+\usepackage{cite}
+\usepackage[english]{babel}
+\usepackage{xcolor}
+\usepackage{listings}
+
+% define colors for IPython syntax highlighting
+\definecolor{codebackground}{RGB}{240, 240, 240}
+\definecolor{keywordcolor}{RGB}{0, 0, 180}
+\definecolor{commentcolor}{RGB}{0, 128, 0}
+\definecolor{stringcolor}{RGB}{163, 21, 21}
+\definecolor{promptcolor}{RGB}{136, 0, 0}
+
+% Define Python style
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{codebackground},
+    keywordstyle=\color{keywordcolor}\bfseries,
+    commentstyle=\color{commentcolor}\itshape,
+    stringstyle=\color{stringcolor},
+    numbers=left,
+    numberstyle=\tiny\color{black},
+    showstringspaces=false,
+    frame=single,
+    rulecolor=\color{black},
+    breaklines=true,
+    captionpos=b,
+    moredelim=[s][\color{promptcolor}]{In[}{]},
+    moredelim=[s][\color{promptcolor}]{Out[}{]}
+}
+
+% define bash listing style
+\lstdefinestyle{bashstyle}{
+    language=bash,
+    basicstyle=\ttfamily\small,      % Monospaced small font
+    keywordstyle=\color{blue},       % Keywords in blue
+    commentstyle=\color{gray},       % Comments in gray
+    stringstyle=\color{red},         % Strings in red
+    backgroundcolor=\color{black!5}, % Light gray background
+    breaklines=true,                 % Allow line breaking
+    frame=single,                    % Frame around the listing
+    numbers=left,                    % Line numbers on the left
+    numberstyle=\tiny\color{black}   % Line number styling
+}
+
+% tile, subtitle, author
+\title{\Huge \textbf{Technological Foundations in Computer Science and Security Controls} \\
+       \huge Digital4Security}
+\author{\textsc{Razvan DEACONESCU} \\
+        \textsc{Radu MANTU}        \\
+        \textsc{Costin CARABAS}}
+\date{}     % don't include current date in \maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+    \maketitle
+
+    % table of contents (covers chapters and sections)
+    \setcounter{tocdepth}{1}
+    \tableofcontents
+
+    % chapter content
+    \includefrom{chapters/10-security-fundamentals}{main}
+    \includefrom{chapters/11-itegrity-confidentiality}{main}
+
+    % bibliography
+    \bibliographystyle{ieeetr}
+    \bibliography{references}
+\end{document}
+
