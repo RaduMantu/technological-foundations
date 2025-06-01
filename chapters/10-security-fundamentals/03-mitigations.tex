@@ -1,0 +1,96 @@
+\section{Mitigation techniques}
+
+Over time, certain mitigation techniques have been developed to inhibit
+attackers. However, a ballance had to be maintained between program security
+and efficiency. As a result, some of the techniques that we are going to
+present are enabled by default. Others are left for developers to judge if the
+security benefits are worth the sacrifices in terms of performance.
+
+\subsubsection{Stack canary}
+
+The \textbf{stack canary} is a security mechanism that is built into most
+compilers and can be enabled through the \texttt{-fstack-protector} flag. The
+canary is a small, random value that is placed on the stack, between the
+function-local variables and the return address. Before a function returns, the
+program checks if the canary value has been altered. Any changes to this value
+indicate that a buffer overflow may have occurred and the program terminates
+in order to prevent the potential execution of malicious code.
+
+The canary value is usually generated at runtime to avoid situations where the
+attacker can learn it by downloading the binary from the same source (e.g., a
+distribution's public package repository) and analying it a priori. Some
+implementations fo this mechanism also XOR the random value with the return
+address or other critical data in order to increase the complexity of any
+viable attack.
+
+This mitigation technique has two shortcomings. First, one can assume that the
+attacker can simply \textit{guess} the random value, especially if it is small
+enough. In reality, the attacker can leverage other vulnerabilities to disclose
+the state of the stack and read the stored random value in preparation for the
+return address overwrite. When demonstrating new exploits, the attacker is
+usually exempted from dealing with the stack canary since the probability of it
+being bypassed is non-zero and also not insignificant enough to be discounted.
+The second problem is that the canary does not protect other function-local
+buffers or variables from being overwritten. As a result, the attacker can
+still mount data-oriented attacks within the same function where the
+vulnerable code is located.
+
+\subsubsection{Safe stack}
+
+The Safe Stack \cite{kuznetzov2018code} mechanism is implemented as an analysis
+and instrumentation pass that determines at compile time what buffers and
+variables that are stored on the stack are guaranteed to be accessed in a safe,
+deterministic manner. All elements that pass this evaluation are placed on the
+safe stack. Meanwhile, all elements that pose a risk of causing buffer overflows
+are placed on the unsafe stack, which is separate in memory. The return address
+is always implicitly placed on the safe stack.
+
+\subsection{Secure Computing state}
+
+Also known as \href{https://www.man7.org/linux/man-pages/man2/seccomp.2.html}{seccomp},
+this mechanism allows the developer to voluntarily tansition the process at
+runtime to a state where its interactions with the operating system are
+restricted. For example, we perviously mentioned how an attacker can perform
+an illigal call to \texttt{mprotect()} in order to make the memory where the
+malicious code was loded executable. However, \texttt{mprotect()} has legitimate
+uses by \texttt{ld-linux}, the dynamic loader that is responsible for loading
+shared libraries in memory. The developers can make a compromise and decide a
+moment when all libraries should have been already loaded and from that point
+onwards, prohibit any \texttt{mprotect()} calls by means of seccomp.
+
+The behaviour that we have just described falls under the purview of what is
+called seccomp's \textbf{strict mode}. However, there is also a separate mode
+of operation called \textbf{filter mode}. In this mode, the developers are
+permitted to attach eBPF programs (i.e., user-provided code that can run in a
+sandboxed environment inside the kernel) to system call invocations that perform
+sanity checks on their arguments.
+
+\subsection{Sanitizers}
+
+\textbf{Sanitizers} are static instrumentation passes that can be enabled when
+compiling applications. These passess will insert additional checks in the
+code emitted by the compiler in order to detect runtime errors. The previously
+discussed Safe Stack mechanism can also be considered a Control-Flow Sanitizer.
+Other sanitizers include:
+
+\begin{itemize}
+    \item \textbf{Address Sanitizer (ASan):} Detects buffer overflows of any
+          type, use-after-free, use-after-return or double-free bugs and any
+          type of illigal memory accesses.
+    \item \textbf{Undefined Behaviour Sanitizer (UBSan):} Detects null pointer
+          dereferences, integer overflows, type mismatches and invalid casts.
+    \item \textbf{Memory Sanitizer (MSan):} Tracks the initialization state of
+          memory and prevents reads from uninitialized memory regions.
+    \item \textbf{Thread Sanitizer (TSan):} Detects data races and thread
+          synchronization issues in multi-threaded programs by monitoring
+          synchronization primitives to identify conflicting accesses without
+          proper locking.
+\end{itemize}
+
+Their use is production is limited due to overhead in terms of both memory usage
+and execution speed. For example, ASan can increase the memory usage by up to
+200\% and reduce execution speed in half. TSan is an even worse offender with
+reported slowdowns of up to 15x and memory usage increase of 10x. Note that
+these overheads should be evaluated on a case-by-case basis but are usually
+deemed unacceptable in release builds.
+

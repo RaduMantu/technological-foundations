@@ -1,0 +1,39 @@
+\newpage
+
+\section{Practical exercises}
+
+The following tasks are styled after Capture The Flag (CTF) challenges. These
+types of competitions are normally a good method of building up your pratical
+skill set. For this introductory module we've kept the difficulty to a minimum.
+Try to familiarize yourself with the essential Linux utilities.
+
+\subsection{Where's my decoder ring?}
+
+You've intercepted a transmission from a \textbf{base} in Area \textbf{64}.
+It's been saved in \texttt{01-transmission.txt}. Try to decode it.
+
+\subsection{State of the art encryption}
+
+You've found a zip archive but it's contents have been encrypted. If you
+try to list its contents with \texttt{unzip} you will find the password. But
+this too was encrypted with a \textit{particular instance} of Caesar's cipher.
+
+\subsection{Just try and run it}
+
+The flag this time is stored in a JPEG image. Or is it a JPEG? \\
+Hint: Yes, it's a JPEG. Don't execute weird stuff, even if \texttt{file} says
+      it's a script.
+
+\subsection{Substitution cipher}
+
+Someone used a substitution cipher to hide the flag from us. Luckily, these
+types of cyphers can be broken iteratively. Look for bigrams, trigrams or try
+guessing words within the text to deduce the missing substitutions.
+
+Use the helper script we've provided. Complete the dictionary with your
+substitutions. By running the script, the substituted letters will be
+highlighted in red. Meanwhile, the remaning letters will be printed normally.
+
+Hint: The cipher seems to only cover letters, not digits. Seems like there's a
+      date in there somewhere. What month could that be?
+

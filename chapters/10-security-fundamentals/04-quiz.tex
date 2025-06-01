@@ -1,0 +1,54 @@
+\newpage
+
+\section{Quiz Questions}
+
+\begin{enumerate}
+    \item What is the primary purpose of threat modeling in cybersecurity?
+    \begin{enumerate}
+        \item To develop new software features securely
+        \item \textbf{To identify, assess, and prioritize potential threats to a
+              system}
+        \item To encrypt sensitive data during transmission
+        \item To monitor network traffic for intrusions
+    \end{enumerate}
+
+    \item What is a key prerequisite for a buffer overflow attack to succeed?
+    \begin{enumerate}
+        \item The attacker must have physical access to the target system
+        \item The system must be running on an outdated operating system with no
+              patches
+        \item The application must lack multi-factor authentication
+        \item \textbf{The target program must fail to validate input size before
+              copying it into a fixed-size buffer}
+    \end{enumerate}
+
+    \item Which sanitizer is specifically designed to detect uninitialized
+          memory read errors that could lead to exploitable vulnerabilities?
+    \begin{enumerate}
+        \item Thread Sanitizer
+        \item Undefined Behavior Sanitizer
+        \item \textbf{Memory Sanitizer}
+        \item Control Flow Sanitizer
+    \end{enumerate}
+
+    \item How does a sanitizer like AddressSanitizer mitigate buffer overflow
+          exploits in practice?
+    \begin{enumerate}
+        \item \textbf{By inserting guard zones around allocated memory and
+              checking for accesses to these zones}
+        \item By rewriting the binary to remove all buffer-related operations
+        \item By enforcing mandatory access controls at the operating system
+              level
+        \item By converting all stack-based buffers to heap-based allocations
+    \end{enumerate}
+
+    \item What is the primary role of seccomp in enhancing system security?
+    \begin{enumerate}
+        \item It encrypts system calls to prevent interception
+        \item \textbf{It restricts the system calls a process can make, limiting
+              its attack surface}
+        \item It monitors memory allocation to prevent buffer overflows
+        \item It enforces mandatory access controls on file operations
+    \end{enumerate}
+\end{enumerate}
+

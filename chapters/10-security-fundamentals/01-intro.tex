@@ -1,0 +1,82 @@
+\section{Overview}
+
+What is cybersecurity? Vague questions usually have many answers that are
+correct in their own respect. In this module, the answer that we are going to
+work with and build upon as we progress is as follows: \textit{"Cybersecurity
+is, given an \textbf{attacker's model} and a specific \textbf{context}, the
+technique to control \textbf{who} may \textbf{use} or \textbf{modify} the
+\textbf{data}"}. Let's break this down.
+
+\subsection{Attacker model}
+
+First, what is an \textbf{attacker model}? The attacker model is a conceptual
+framework that allows us to describe potential adversaries based on our
+assumtions in regards to their goals, resources, knowledge, and methods. Some
+key aspects to consider when formulating the attacker model are as follows:
+
+\begin{itemize}
+    \item \textbf{Capabilities:} The computational power at the attacker's
+          disposal, his access to specialized tools, or insider privileges
+          (e.g., physical access to our assets, etc.)
+    \item \textbf{Knowledge:} What the attacker knows. This can include our
+          system architecture (including defensive measures in place), source
+          code of deployed services, partial data, etc.
+    \item \textbf{Motivation:} Knowing the objective can help predict the
+          behaviour of the attacker. For example, attempts at causing disruption
+          (i.e., denial of service) will be more overt than attempts at
+          infiltration with the purpose of data theft.
+    \item \textbf{Methods:} These are techniques that the attacker may employ to
+          reach his objective. These include but are not limited to social
+          engineering, brute force attacks, exploiting known or zero-day
+          software vulnerabilities, etc.
+\end{itemize}
+
+Note that these are very general aspects that you may need to consider. However,
+each specific situation will demand additional consideration. For example, in
+cryptography one must determine whether the attacker is assumed to be
+\textbf{passive} or \textbf{active}. A passive attacker can only eavesdrop on
+communication, while an active attacker can intercept and modify in-transit
+data. Some algorithms (e.g., Diffie-Hellman key exchange
+\cite{mitra2021prevention}) are resistant to passive attackers but provide no
+guarantees against their stronger counterpart.
+
+\subsection{Security context}
+
+The \textbf{security context} refers to the specific environment, conditions
+and constraints that shape the assumptions and parameters of the attacker model.
+In other words, the security context ensures that the model is tailored to the
+system's unique characteristics and operational environment. Below we enumerate
+a few key elements that are typically considered:
+
+\begin{itemize}
+    \item \textbf{System architecture:} The structure of the system, including
+          both hardware and software components, as well as data flows. This
+          determines what parts of the system are exposed to the attacker and
+          allows the security team to focus on relevant threats. For example,
+          when securing a web application, one can assume that the attacker has
+          access to the public endpoints but not to the internal server
+          configuration. As a result, the focus should be on external threats
+          such as SQL injections attacks \cite{clarke2009sql} and DDoS attacks
+          \cite{ramesh2023hybrid}.
+
+    \item \textbf{Assets and data sensitivity:} The critical resources or data
+          the system handles. Understanding what these are can help identify the
+          attacker's likely targets and motivations. For example, the security
+          context of a banking system should prioritize the safety of the user's
+          financial data. As a result, the attacker model should include
+          Advanced Persistent Threats (APT) \cite{alshamrani2019survey} that
+          target transaction systems. Note that depending on the sensitivity of
+          the data in question, regulations may impose restrictions on what
+          defensive solutions may be used.
+
+    \item \textbf{Access points and boundaries:} Entry points to the system
+          (e.g., APIs, user interfaces, physical devices) and trust boundaries
+          (e.g., between users, servers, first-party and third-party services).
+          This information helps narrow down where an attacker might gain entry
+          or escalate privileges, shaping assumptions about their starting
+          position. For example, can a corporate computer network be compromised
+          from within due to lax Bring Your Own Device (BYOD) policies
+          \cite{alotaibi2018review} or are the threats purely external? What if
+          the attacker gains access to VPN credentials of an employee and thus
+          gains access to the internal network?
+\end{itemize}
