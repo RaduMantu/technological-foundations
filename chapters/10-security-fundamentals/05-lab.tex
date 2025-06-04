@@ -3,7 +3,7 @@
 \section{Practical exercises}
 
 The following tasks are styled after Capture The Flag (CTF) challenges. These
-types of competitions are normally a good method of building up your pratical
+types of competitions are normally a good method of building up your practical
 skill set. For this introductory module we've kept the difficulty to a minimum.
 Try to familiarize yourself with the essential Linux utilities.
 
@@ -14,7 +14,7 @@ It's been saved in \texttt{01-transmission.txt}. Try to decode it.
 
 \subsection{State of the art encryption}
 
-You've found a zip archive but it's contents have been encrypted. If you
+You've found a zip archive but its contents have been encrypted. If you
 try to list its contents with \texttt{unzip} you will find the password. But
 this too was encrypted with a \textit{particular instance} of Caesar's cipher.
 
@@ -32,8 +32,78 @@ guessing words within the text to deduce the missing substitutions.
 
 Use the helper script we've provided. Complete the dictionary with your
 substitutions. By running the script, the substituted letters will be
-highlighted in red. Meanwhile, the remaning letters will be printed normally.
+highlighted in red. Meanwhile, the remianing letters will be printed normally.
 
 Hint: The cipher seems to only cover letters, not digits. Seems like there's a
       date in there somewhere. What month could that be?
+
+\subsection{Overwriting return address demo}
+
+In this task, we are going to look at a demo application that will overwrite
+the return address of a function. This is not the typical buffer overflow
+vulnerability that was discussed, but instead a simpler example to help you
+understand how the exploit works. Your job will be to investigate the
+application with \textbf{gdb}, the GNU Debugger, and observe how the return
+value overwrite takes place.
+
+\subsubsection{Setting up pwngdb}
+
+We recommend setting up
+\href{https://github.com/pwndbg/pwndbg.git}{pwndbg}, a plugin meant to make
+\texttt{gdb} more user friendly:
+
+\begin{lstlisting}[style=bashstyle]
+# make sure you are in your home directory
+$ cd ~
+
+# create a hidden directory to store gdb-related plugins
+$ mkdir -p .gdb/
+
+# clone pwndbg
+$ git clone git clone https://github.com/pwndbg/pwndbg .gdb/pwndbg
+
+# run the setup script
+$ pushd .gdb/pwndbg
+$ ./setup.sh
+$ popd
+
+# configure gdb to load pwndbg on startup
+$ echo "source $(realpath source .gdb/pwndbg/gdbinit.py)" > .gdbinit
+\end{lstlisting}
+
+For future reference on interacting with \texttt{gdb}, we recommend this
+\href{https://users.ece.utexas.edu/~adnan/gdb-refcard.pdf}{reference card}.
+
+\subsubsection{Preparing the binary}
+
+For this exercise, we have provided the source code of the program under test.
+In order to compile it, run the following command:
+
+\begin{lstlisting}[style=bashstyle]
+$ gcc -fno-stack-protector -g -o overflow 05-overflow.c
+\end{lstlisting}
+
+In the command above, the following flags have been used:
+
+\begin{itemize}
+    \item \textbf{-fno-stack-protector:} Ensures that the stack canary is
+          disabled.
+    \item \textbf{-g:} Adds debug symbols to the compiled program. Allows us
+          to reference variables and functions by name within \texttt{gdb}.
+    \item \textbf{-o overflow:} This sets \texttt{overflow} as the name of the
+          output binary.
+\end{itemize}
+
+\subsubsection{Test it out}
+
+Run the compiled program while giving it the \textit{"demo"} command line
+argument:
+
+\begin{lstlisting}[style=bashstyle]
+$ ./overflow demo
+\end{lstlisting}
+
+Now, try running it with the \textit{"flag"} argument. This will most likely
+cause a segmentation fault. Investigate this problem with \texttt{gdb} and try
+to extract the flag from memory (even if you have it in the source code).
 
