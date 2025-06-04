@@ -6,7 +6,7 @@ and efficiency. As a result, some of the techniques that we are going to
 present are enabled by default. Others are left for developers to judge if the
 security benefits are worth the sacrifices in terms of performance.
 
-\subsubsection{Stack canary}
+\subsection{Stack canary}
 
 The \textbf{stack canary} is a security mechanism that is built into most
 compilers and can be enabled through the \texttt{-fstack-protector} flag. The
@@ -18,7 +18,7 @@ in order to prevent the potential execution of malicious code.
 
 The canary value is usually generated at runtime to avoid situations where the
 attacker can learn it by downloading the binary from the same source (e.g., a
-distribution's public package repository) and analying it a priori. Some
+distribution's public package repository) and analzying it a priori. Some
 implementations fo this mechanism also XOR the random value with the return
 address or other critical data in order to increase the complexity of any
 viable attack.
@@ -35,7 +35,7 @@ buffers or variables from being overwritten. As a result, the attacker can
 still mount data-oriented attacks within the same function where the
 vulnerable code is located.
 
-\subsubsection{Safe stack}
+\subsection{Safe stack}
 
 The Safe Stack \cite{kuznetzov2018code} mechanism is implemented as an analysis
 and instrumentation pass that determines at compile time what buffers and
@@ -45,14 +45,44 @@ safe stack. Meanwhile, all elements that pose a risk of causing buffer overflows
 are placed on the unsafe stack, which is separate in memory. The return address
 is always implicitly placed on the safe stack.
 
+\subsection{Address Space Layout Randomization}
+
+Also known as \textbf{ASLR}, this mechanism is automatically applied by the
+kernel to all processes. Whenever a process loads a new object (e.g., a shared
+library) in its address space, the kernel will introduce a random offset that
+ensures the functions are highly unlikely to remain mapped at the same address
+between executions. Check this for yourself: open multiple terminals and run
+\texttt{pmap \$\$} in each one. Observe the virtual addresses at which each
+segment is mapped.
+
+As a consequence, the attacker always has to contend with the fact that the
+address of the function he wants to reach is random. However, there is a way to
+overcome this challenge. Although the address at which an object is loaded
+varies between executions, the relative offsets of functions within the same
+object does not. Take for example \texttt{printf()} and \texttt{strerror()}
+within \texttt{libc}:
+
+\begin{lstlisting}[style=bashstyle]
+# get the symbol offsets within the libc library
+# filter for printf() and strerror()
+$ nm -D /usr/lib/libc.so.6 | grep -e ' printf@@' -e ' strerror@@'
+    000000000005a440 T printf@@GLIBC_2.2.5
+    00000000000ad660 T strerror@@GLIBC_2.2.5
+\end{lstlisting}
+
+If we calculate the difference, we will conclude that the entry point to the
+\texttt{printf()} function is 340,512 bytes below that of \texttt{strerror()}.
+If the attacker can disclose the address of only one function in \texttt{libc},
+he will automatically know the location of all other functions.
+
 \subsection{Secure Computing state}
 
 Also known as \href{https://www.man7.org/linux/man-pages/man2/seccomp.2.html}{seccomp},
-this mechanism allows the developer to voluntarily tansition the process at
+this mechanism allows the developer to voluntarily transition the process at
 runtime to a state where its interactions with the operating system are
-restricted. For example, we perviously mentioned how an attacker can perform
-an illigal call to \texttt{mprotect()} in order to make the memory where the
-malicious code was loded executable. However, \texttt{mprotect()} has legitimate
+restricted. For example, we previously mentioned how an attacker can perform
+an illegal call to \texttt{mprotect()} in order to make the memory where the
+malicious code was loaded executable. However, \texttt{mprotect()} has legitimate
 uses by \texttt{ld-linux}, the dynamic loader that is responsible for loading
 shared libraries in memory. The developers can make a compromise and decide a
 moment when all libraries should have been already loaded and from that point
@@ -68,7 +98,7 @@ sanity checks on their arguments.
 \subsection{Sanitizers}
 
 \textbf{Sanitizers} are static instrumentation passes that can be enabled when
-compiling applications. These passess will insert additional checks in the
+compiling applications. These passes will insert additional checks in the
 code emitted by the compiler in order to detect runtime errors. The previously
 discussed Safe Stack mechanism can also be considered a Control-Flow Sanitizer.
 Other sanitizers include:
@@ -76,7 +106,7 @@ Other sanitizers include:
 \begin{itemize}
     \item \textbf{Address Sanitizer (ASan):} Detects buffer overflows of any
           type, use-after-free, use-after-return or double-free bugs and any
-          type of illigal memory accesses.
+          type of illegal memory accesses.
     \item \textbf{Undefined Behaviour Sanitizer (UBSan):} Detects null pointer
           dereferences, integer overflows, type mismatches and invalid casts.
     \item \textbf{Memory Sanitizer (MSan):} Tracks the initialization state of
