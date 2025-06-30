@@ -1,0 +1,203 @@
+\section{Cryptography basics}
+
+Before diving into more complex mechanisms such as digital certificats, we must
+first understand the cryptographic building blocks that ensure their security.
+What follows is a high-level overview of cryptographic primitives that offer
+the functionality needed to securely store information and to establish
+secure communication channels.
+
+\subsection{Hashes}
+
+You may already be familiar with hash functions at this point. Hash functions
+are used in \href{https://en.cppreference.com/w/cpp/container/unordered_map.html}
+{hash tables} to reduce a certain input to fixed-size value that ideally would
+be representative of a subset of inputs. These hash functions are used for
+rapid data storage and retrieval. These functions are required to be fast
+and map the set of possible inputs to that of outputs as uniformly as possible.
+However, \textbf{cryptographic hash functions} have other requirements:
+
+\begin{itemize}
+    \item \textbf{Pre-image resistance:} Given a hash value $h$, it should be
+          computationally infeasible for an attacker to find an input $m$ such
+          that $h = H(m)$ for a given hash function $H$. This guarantees that
+          the attacker cannot reverse engineer the original input from the
+          hash.
+
+    \item \textbf{Second pre-image resistance:} Given an input $m_1$ and its
+          hash $h = H(m_1)$, it should be computationally infeasible to find a
+          different input $m_1 \neq m_2$ such that $H(m_1) = H(m_2)$. This
+          guarantees that an attacker cannot find a mutation of the input that
+          can pass as the original.
+
+    \item \textbf{Collision resistance:} It should be computationally infeasible
+          to find any two distinct inputs $m_1$ and $m_2$ such that $H(m_1) = H(m_2)$.
+          This is stronger than second pre-image resistance in that one
+          of the two inputs is not fixed. It ensures that no two different
+          inputs produce the same hash.
+
+    \item \textbf{Deterministic:} The hash function must always produce the
+          same output for the same input, ensuring consistency across uses.
+
+    \item \textbf{Fixed output size$^*$:} The hash function should produce a
+          fixed-length output (e.g., 256 bits for SHA-256) regardless of the
+          input size.
+
+    \item \textbf{Small changes cause large differences:} A small change in
+          the input (e.g., flipping a single bit) should produce a significantly
+          different hash value. As a result, an attacker should not be able to
+          determine the extent to which the input was changed by only observing
+          the output hash values.
+
+    \item \textbf{One-way function:} The function should be easy to compute in
+          one direction (input to hash) but computationally infeasible to invert
+          (hash to input), reinforcing pre-image resistance.
+\end{itemize}
+
+(*) Note that the primitive one-way function that represents the foundation of
+a hash function usually has both a fixed output, \textit{and} input. For
+example, SHA-256 uses a \textbf{Merkle-Damg{\aa}rd construction} \cite{backes2012verified}
+that iteratively applies a compression function over a series of fixed-sized
+input blocks to produce a 256-bit output. Similarly, SHA-3 uses what is called
+a \textbf{Keccak sponge function} \cite{bertoni2009keccak} to absorbe input
+blocks into its internal state before entering a \textit{squeezing phase} (i.e.,
+repeatedly applying transformations on the internal state until the desired
+number of output bits is extracted).
+
+All these requirements make cryptographic hash functions suitable for a number
+of tasks:
+
+\begin{itemize}
+    \item \textbf{Data integrity verification:} When data is transmitted or
+          stored, its hash is calculated and sent / stored alongside the data.
+          When the data is later retrieved, the hash is recalculated and compared
+          to ensure that the data hasn't been altered (either intentionally or
+          due to corruption). For example, downloadable disk images for Linux
+          distributions usually have a
+          \href{https://www.releases.ubuntu.com/bionic/SHA256SUMS}{SHA-256 file}
+          available in order to manually check the integrity if needed.
+
+    \item \textbf{Digital signatures:} Cryptographic hashes are used in digital
+          signatures to ensure the authenticity and integrity of messages. A
+          digital signature is typically created by signing a hash of the
+          message with a private key.
+
+    \item \textbf{Password hashing:} Instead of storing plain-text passwords,
+          systems store a hash of the password. When a user logs in, their
+          password is hashed and compared to the stored hash. This ensures that
+          even if the password database is compromised, the actual passwords are
+          not exposed. Inspect the \textit{/etc/shadow} file on your Linux
+          system and look for your username. Consult the
+          \href{https://www.man7.org/linux/man-pages/man5/shadow.5.html}{man page}
+          for more details.
+
+    \item \textbf{Digital fingerprint:} A hash function can serve as a digital
+          fingerprint of a file or data. It provides a unique representation of
+          data that is compact and easy to compare. For example, \textbf{git}
+          uses a SHA-256 digest to uniquely identify each commit (i.e., change)
+          in a repository. This hash is computed not only over the contents of
+          the changes but is also based on the hash of the previous commit, thus
+          ensuring the consistency of the deltas that produced the current
+          state of the project.
+
+    \item \textbf{Random number generation:} Cryptographic hashes are often used
+          in pseudo-random number generation (PRNG). They can be used to
+          generate cryptographically secure random numbers or keys, which are
+          important in cryptographic protocols. Ideally, one would use a source
+          of true randomness, however these are uncommon. E.g., one would need
+          a Trusted Platform Module (TPM). Alternatively, Intel CPUs have the
+          \href{https://www.felixcloutier.com/x86/rdrand}{RDRAND} instruction
+          that loads hardware generated random values. Setting aside whether
+          these solutions are truly random or whether they include hidden
+          hardware backdoors, their throughput of random data may be
+          insufficient. For that reason, PRNGs can achieve higher throughputs
+          at the cost of potentially introducing biases in the RNG process.
+\end{itemize}
+
+
+\subsection{Encryption}
+
+Encryption algorithms can largely be categorized into two forms: symmetric and
+asymmetric. \textbf{Symmetric encryption} schemes use the same key for both
+encryption and decryption. The most popular algorithm of this type is the
+Advanced Encryption Standard (AES). AES consits of a sequence of very simple
+operations (e.g., xor, rotations, shuffles, etc.) of data. This makes it
+extremely efficient and thus suitable for encrypting large amounts of data
+(e.g., hard drives). However, the requirement of utilizing the same key for
+both encryption and decryption presents challenges when having to apply it
+for securing the communication between two or more parties.
+
+\textbf{Asymmetric encryption} differs from its counterpart in that it utilizes
+two keys: one for encryption and one for decryption. The most well-known example
+is named after its creators: Rivest–Shamir–Adleman (RSA). In this encryption
+scheme, it is guaranteed that only the public key can decrypt a messaged that
+was encrypted with the private key. Furthermore, the private key cannot be
+easily deduced based solely on the public key. Only the entity that created the
+key pair has access to the information required to calculate the inverse of a
+key. Next, we will describe the process of generating a RSA key but for now,
+remember that the advantage of using asymmetric encryption is that it is
+perfectly safe to distribute the public key component. Moreover, if the public
+key holder can decrypt a message using said key, it is guaranteed that the
+message has been encrypted with its private counterpart. That private key
+component is assumed to be known to a single entity. If you have ever configured
+your public SSH key on a remote server, this concept should be easily understood.
+
+Before enumerating the steps required to obtain a RSA key pair, it is important
+to first understsand how the encryption and decryption process works. When a
+plaintext message $m$ needs to be encrypted with the private key $e$, both $m$
+and $E$ are seen not as character strings, but as single, large integers.
+Normally, native data types are defined based on register sizes and are limited
+to 8, 16, 32 or 64 bits. However, this limitation stems from how arithmetic
+operations are implemented in hardware, by the CPU. Nothing prevents us from
+defining data types that are larger than 64 bits. The only downside is that
+dedicated libraries must be utilized to perform arithmetic operations that are
+implemented in software, rather than strictly in hardware. The encryption
+process consists of calculating the value of the cyphertext $c = m^e \pmod{N}$.
+We already know who $m$ and $e$ are. $N$ is a publicly known large number that
+is inextricably linked to the key generation process. The reason why we perform
+a modular exponentiation operation in order to obtain the cyphertext is that
+we need to maintain a manageable size for the output. Additionally, the
+mathematic foundations of RSA guarantee that the operation is invertible, even
+in a modulus $N$ class. In other words, it is guaranteed that there exists a
+decryption key $d$ such that $m = c^d \pmod{N}$. This being said, the process of
+selecting $N$ and generating $e$ and $d$ is as follows:
+
+\begin{enumerate}
+    \item Select two large, different, prime numbers $p$ and $q$. Their
+          selection is arbitrary, meaning that there are no wrong $p$ and $q$
+          for which the key generation, or encryption / decryption will not work.
+          Note however that selecting \textit{"weak"} values can make it easier
+          for an attacker to find $e$ based on $d$ and $N$.
+
+    \item Calculate $N = pq$. This $N$ will be known as the modulus of the
+          key pair and will be publicly known. $p$ and $q$ will remain known
+          only to the holder of the private key. In fact, the security guarantees
+          of RSA rely solely on $N$'s factorization being difficult to achieve.
+          If an attacker can extract $p$ and $q$ from $N$, the keypair can be
+          considered to be compromised. Choosing $p$ and $q$ values that are
+          either \href{https://factordb.com/}{well known}, or susceptible to
+          brute force attacks (e.g., close to 1 or to $\sqrt{N}$) can lead to
+          this eventuality.
+
+    \item Calculate \textbf{Euler's Totient Function ($\phi$)} for $N$. This function
+          represents the number of positive integers up to a given integer $N$
+          are relatively prime to $N$. Due to our choice of prime numbers that
+          compose $N$, we can calculate $\phi(N) = (p - 1) (q - 1)$. Without
+          knowing $p$ and $q$, the attacker cannot calculate $\phi(N)$ as easily.
+
+    \item Choose an arbitrary $e$ such that $1 < e < \phi(N)$. Once again, there is
+          no \textit{wrong} value for $e$ that the encryption won't work, but
+          there are \textit{weak} values that can be chosen, which leads to
+          other problems \cite{jochemsz2007polynomial}.
+
+      \item Compute $d$ such that relation $de \equiv 1 \pmod{\phi(N)}$. Normally, we would
+          first need to determine whether a $d$ that satisfies this relation
+          even exists. This is normally done by applying Bézout's identity
+          that states the following: \textit{Let there be $a$ and $b$ integers
+          with the greatest common divisor $d$. Then there exist integers $x$
+          and $y$ such that $ax + by = d$.} This theorem also holds in a
+          modulus class, which guarantees that our initial relation will always
+          hold. As a result, we are guaranteed that there is a $d \equiv e^{-1}
+          \pmod{\phi(N)}$ which can be calculated using the
+          \href{https://cp-algorithms.com/algebra/extended-euclid-algorithm.html}
+          {Extended Euclid algorithm)}.
+\end{enumerate}
