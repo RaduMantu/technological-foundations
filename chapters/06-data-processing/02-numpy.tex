@@ -1,0 +1,230 @@
+\section{Introduction to NumPy}
+
+Python is widely used today for data manipulation, processing and plotting. As
+you know, Python was developed to act as \textit{"glue code"}, allowing the
+user to easily interface with different modules and quickly prototype ideas.
+These modules are already highly optimized, with the performance critical
+components usually being written in compiled languages such as C++. Take for
+example the \href{https://github.com/numpy/numpy}{NumPy} module. NumPy is
+short for \textit{Numerical Python} and is a fundamental numerical computation
+module used data science, machine learning, signal processing, and many other
+fields. Before moving on to actually plotting data sets in Pythhon, we will
+first introduce a few elementary concepts regarding NumPy.
+
+Moving forward, we suggest setting up a virtual environment for installing
+Python modules using the \textbf{pip3} management tool. A virtual environment
+ensures that your modules are installed in a local directory, not at system
+level. This is a good practice that enables fine-grained management of module
+versions across projects, all without interfering with certain system utilities
+that may themselves use Python.
+
+\begin{lstlisting}[style=bashstyle]
+# create an empty directory and move into it
+$ mkdir plotting-lab/ && cd plotting-lab/
+
+# create a virtual environment inside a hidden directory
+$ python3 -m venv .venv
+
+# activate said virtual environment (this will modify your prompt)
+$ source .venv/bin/activate
+
+# if you wish to deactivate your current virtual environment
+# NOTE: don't do this now, we still need it
+$ deactivate
+
+# install NumPy, Matplotlib and a feature-rich Python3 shell called IPython
+$ pip3 install numpy matplotlib ipython
+
+# start an IPython shell
+$ ipython3
+\end{lstlisting}
+
+Now that we have an IPython shell open, we can start by importing the NumPy
+module that we just installed and rename it to \texttt{np} as a shorthand.
+The fundamental data type in NumPy is the \textbf{array} or rather, the
+\textbf{ndarray} that can scale to any (N) dimension. NumPy arrays can be
+initialized from native Python array types:
+
+\begin{lstlisting}[style=pythonstyle]
+In [1]: import numpy as np
+
+In [2]: a = np.array([ [0, 1, 2, 3, 4],
+   ...:                [5, 6, 7, 8, 9] ])
+
+In [3]: a.shape
+Out[3]: (2, 5)
+
+In [4]: a
+Out[4]:
+array([[0, 1, 2, 3, 4],
+       [5, 6, 7, 8, 9]])
+\end{lstlisting}
+
+Here, we just created a 2x5 matrix. The dimensions of this \texttt{ndarray}
+can be checked by reading the \texttt{shape} attribute of the object. Note that
+while each element from our array can be modified, the result must be consistent
+with the type of all internal elements.
+
+
+\begin{lstlisting}[style=pythonstyle]
+In [5]: b = np.ones(5)
+
+In [6]: b
+Out[6]: array([1., 1., 1., 1., 1.])
+
+In [7]: a[0] += b
+---------------------------------------------------------
+UFuncTypeError          Traceback (most recent call last)
+Cell In[7], line 1
+----> 1 a[0] += b
+
+UFuncTypeError: Cannot cast ufunc 'add' output from dtype('float64') to dtype('int64') with casting rule 'same_kind'
+\end{lstlisting}
+
+In this example, the \texttt{np.ones()} function generates an 1x5
+\texttt{ndarray} of type \textbf{float64} while our original matrix contains
+\textbf{int64} values. Normally, adding a floating point value to an integer
+would promote the integer's type to that of float, since natural numbers
+($\mathbb{N}$) are a subset of real numbers ($\mathbb{R}$). Here however,
+performing a partial overwrite would create an internal type inconsistency,
+hence the error. To solve this, we can cast the entire matrix so that it uses
+floating point representation internally, for both rows.
+
+\begin{lstlisting}[style=pythonstyle]
+In [8]: a.dtype
+Out[8]: dtype('int64')
+
+In [9]: a = a.astype(b.dtype)
+
+In [10]: a.dtype
+Out[10]: dtype('float64')
+
+In [11]: a[0] += b
+
+In [12]: a
+Out[12]:
+array([[1., 2., 3., 4., 5.],
+       [5., 6., 7., 8., 9.]])
+\end{lstlisting}
+
+NumPy also has a number of built-in functions for performing specific
+calculations such as matrix multiplications. In the next code example, we will
+generate a 5x2 matrix of random data (between 0 and 1) and multiply it with
+or 2x5 matrix \texttt{a}. Notice how using the default multiplication operator
+\textbf{*} raises an error. The reason for this is that in NumPy, this
+represents an element-wise multiplication. As such, there is an expectation that
+the two operands (i.e., \texttt{a} and \texttt{b}) would be dimensionally
+coherent. In order to calculate the dot product, we can either use the
+\texttt{np.dot()} function or the \textbf{@} operand that NumPy introduces.
+
+\begin{lstlisting}[style=pythonstyle]
+In [13]: b = np.random.rand(5, 2)
+
+In [14]: b
+Out[14]:
+array([[0.11761779, 0.47138062],
+       [0.98613619, 0.71405117],
+       [0.96263751, 0.30874237],
+       [0.08753871, 0.82685058],
+       [0.16948855, 0.21551741]])
+
+In [15]: a * b
+---------------------------------------------------------
+ValueError              Traceback (most recent call last)
+Cell In[15], line 1
+----> 1 a * b
+
+ValueError: operands could not be broadcast together with shapes (2,5) (5,2)
+
+In [16]: np.dot(a, b)
+Out[16]:
+array([[ 6.17540028,  7.21069945],
+       [15.46907525, 17.35686806]])
+
+In [17]: np.dot(b, a)
+Out[17]:
+array([[ 2.474,  3.063,  3.652,  4.241,  4.830],
+       [ 4.556,  6.256,  7.956,  9.656, 11.357],
+       [ 2.506,  3.777,  5.049,  6.320,  7.591],
+       [ 4.221,  5.136,  6.050,  6.964,  7.879],
+       [ 1.247,  1.632,  2.017,  2.402,  2.787]])
+
+In [18]: a @ b
+Out[18]:
+array([[ 6.17540028,  7.21069945],
+       [15.46907525, 17.35686806]])
+\end{lstlisting}
+
+One last concept that we need to introduce for now is that of \textbf{axes}.
+Previously, we mentioned that the fundamental data structure in NumPy, the
+\texttt{ndarray}, represends N-dimensional data. An \textbf{axis} represents
+a \textbf{direction} along one of these dimensions. Normally, functions such
+as \texttt{np.average()} can be applied to \texttt{ndarray}s of any shape and
+will perform their computation on \textit{all of the data} that is contained
+in said arrays. By specifying an axis, we force these functions to perform their
+calculation only along that direction. Take the following example:
+
+\begin{lstlisting}[style=pythonstyle]
+In [19]: a
+Out[19]:
+array([[1., 2., 3., 4., 5.],
+       [5., 6., 7., 8., 9.]])
+
+In [20]: a.shape
+Out[20]: (2, 5)
+
+In [21]: np.average(a)
+Out[21]: np.float64(5.0)
+
+In [22]: np.average(a, axis=0)
+Out[22]: array([3., 4., 5., 6., 7.])
+
+In [23]: np.average(a, axis=1)
+Out[23]: array([3., 7.])
+\end{lstlisting}
+
+The axis index corresponds to the index of each dimension size described in
+\texttt{a.shape}. So \texttt{axis=0} corresponds to the \textit{"rows"}
+dimension, or \textit{"top to bottom"} if you like. Meanwhile \texttt{axis=1}
+corresponds to the \textit{"columns"} dimension, or \textit{"left to right"}.
+Notice how in operation 21 we calculate the average value in the 2x5 matrix.
+However, when specifying \texttt{axis=0}, the same function operates solely on
+the rows dimension resulting in one answer per column. Similarly for
+\texttt{axis=1}, all columns are folded into a single average value for each
+row. Remember that an axis does not necessarily need to be a single number.
+Take for example a higher order data structure, such as a cube. What if we
+wanted to split the cube in 2D slices and compute the average of these slices,
+on one dimension?
+
+\begin{lstlisting}[style=pythonstyle]
+In [24]: a = np.random.rand(3, 4, 5)
+
+In [24]: a
+Out[24]:
+array([[[0.819, 0.652, 0.996, 0.122, 0.422],
+        [0.591, 0.065, 0.086, 0.844, 0.256],
+        [0.561, 0.154, 0.543, 0.401, 0.442],
+        [0.823, 0.663, 0.637, 0.344, 0.054]],
+
+       [[0.351, 0.186, 0.973, 0.051, 0.331],
+        [0.546, 0.008, 0.348, 0.833, 0.150],
+        [0.582, 0.715, 0.393, 0.715, 0.847],
+        [0.408, 0.994, 0.238, 0.466, 0.861]],
+
+       [[0.162, 0.197, 0.728, 0.451, 0.513],
+        [0.443, 0.347, 0.484, 0.700, 0.096],
+        [0.149, 0.748, 0.411, 0.221, 0.622],
+        [0.641, 0.297, 0.744, 0.990, 0.395]]])
+
+In [24]: a.shape
+Out[24]: (3, 4, 5)
+
+In [24]: np.average(a, axis=(1, 2))
+Out[24]: array([0.47428756, 0.50038942, 0.46752885])
+\end{lstlisting}
+
+Remember that these are just some fundamental concepts that are meant to help
+you get started with generating simple plots. For a more detailed introduction
+to NumPy, we recommend \href{https://numpy.org/doc/stable/user/index.html}
+{the official user guide}.
+
