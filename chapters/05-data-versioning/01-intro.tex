@@ -1,0 +1,36 @@
+\section{Overview}
+
+Data storage is a critical aspect of managing information in any system,
+ensuring that data is securely saved, easily accessible, and efficiently
+organized. While local file systems or
+\href{https://cloud.google.com/learn/what-is-object-storage}{object storage} are
+used for simpler applications, cloud-based storage systems (e.g., Amazon S3,
+Google Cloud Storage, etc.) can provide a more scalable and durable alternative
+albeit at a higher cost. The choice of storage depends on many factors (e.g.,
+data type, access patterns, scalability needs, cost, etc.) and should be made on
+a case by case basis. Ensuring data integrity, security, and availability
+through redundancy and backups is paramount in any storage strategy.
+
+Versioning data is the process of tracking and managing changes to data over
+time, allowing users to access previous states, compare changes, or revert to
+earlier versions if needed. This is particularly important in collaborative
+environments or systems where data evolves, such as software development,
+machine learning datasets, or content management. Version control systems like
+\href{https://github.com/git-guides}{Git} are commonly used for code and
+text-based data, storing snapshots of changes in a repository with metadata like
+timestamps and authorship. Although Git is more often than not used to also
+store non-text-based files (e.g., PDFs, binary blobs, etc.), alternatives such
+as Data Version Control (DVC) or Delta Lake provide better versioning
+capabilities for large data sets or binary data types. Keep in mind that certain
+aspects of version control such as collaborative editing of documents can be
+tied into a product ecosystem. For example, editing docx or xlsx files from the
+Microsoft Office suite can be collaborative insofar as using OneDrive or
+SharePoint as storage environments. Free, open-source alternatives exist but
+those require that you switch to a different software stack that can integrate
+with third-party solutions.
+
+Effective data storage and versioning require careful planning to balance
+performance, cost, and usability. Storage systems should be optimized for
+read/write speeds and scalability, while versioning systems must handle
+conflicts and provide clear change histories.
+
