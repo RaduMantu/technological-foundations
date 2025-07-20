@@ -1,0 +1,134 @@
+\newpage
+
+\section{Practical exercises}
+
+\begin{itemize}
+    \item process of creating a git repository and pushing changes
+    \item git rebase
+    \item git worktrees
+    \item solving merge conflicts
+\end{itemize}
+
+\subsection{Setting up a RAID array}
+
+In this exercise, we are going to use \textit{regular files} as storage devices
+in order to create a functioning RAID array. The first step is to create two
+files using the \textbf{truncate} command. \textbf{dd} could also be used if we
+wanted to initialize the files with data from \texttt{/dev/random} or
+\texttt{/dev/zero}. Otherwise, this method will simply claim the required space
+for the file without performing any costly I/O operation.
+
+\begin{lstlisting}[style=bashstyle]
+$ truncate -s 4G disk-01.img disk-02.img
+
+$ du -h disk-0?.img
+    0       disk-01.img
+    0       disk-02.img
+
+$ ls -lh disk-0?.img
+    -rw-r--r-- 1 student users 4.0G Jul 20 18:20 disk-01.img
+    -rw-r--r-- 1 student users 4.0G Jul 20 18:20 disk-02.img
+\end{lstlisting}
+
+Notice how the actual disk usage obtained with \textbf{du} is zero. That is
+because the disk images created with \textbf{truncate} are
+\href{https://wiki.archlinux.org/title/Sparse_file}{sparse files}. Nonetheless,
+the \textbf{ls} command will show their logical size that is stored in their
+metadata.
+
+Next, we are going to create what are called \textbf{loopback devices}. These
+are simulated storage devices that will use our two files are the backing
+storages. This system is usually emplyed by \textbf{Virtual Machine Managers
+(VMM)} but also by package manages such as \textbf{snap} that distribute an
+application bundled with all its dependencies inside a disk image. If you are
+using Ubuntu, know that \textbf{apt} is often used as a wrapper over
+\textbf{snap} for certain packages, so you will see \textit{many} more loopback
+devices apart from those that you will create.
+
+\begin{lstlisting}[style=bashstyle]
+$ sudo losetup -f disk-01.img
+$ sudo losetup -f disk-02.img
+
+$ losetup -l
+    NAME       SIZELIMIT OFFSET AUTOCLEAR RO BACK-FILE                 DIO LOG-SEC
+    /dev/loop1         0      0         0  0 /home/student/disk-02.img   0     512
+    /dev/loop0         0      0         0  0 /home/student/disk-01.img   0     512
+\end{lstlisting}
+
+The two new entries in the \texttt{/dev/} directory can be used as any other
+block device (i.e., SSD, HDD, USB stick, etc.) in that they can be formatted and
+mounted. Nonetheless, we are going to use them as backing storage devices for
+our RAID array:
+
+\begin{lstlisting}[style=bashstyle]
+$ sudo mdadm --create /dev/md0 \
+             --level 1         \
+             --bitmap internal \
+             --raid-devices 2  \
+             /dev/loop0 /dev/loop1
+\end{lstlisting}
+
+With this, we have created a new RAID-1 array that will duplicate data between
+the two disks. So if one disk fails, the data will still be accessible to us.
+The name of the resulting RAID device is \texttt{/dev/md0} and it can be
+formatted with a filesystem or even initialized with a partition table via
+\textbf{fdisk} if we wish to have more than one partitions, optionally with
+different filesystems. The \textbf{--bitmap} flag communicates our desire to
+create a \textbf{write-intent bitmap} which is a software RAID feature that
+improves the efficiency of re-synchronizing arrays, particularly after an
+unclean shutdown or when a disk is temporarily removed and then re-added.
+
+The next step is to format the RAID device. For this purpose, we will choose
+a \textbf{vFAT (Virtual File Allocation Table} file system because it is faster
+and we only need a method of organizing the file data. Once the storage device
+is formatted, we can mount it as any othder device.
+
+\begin{lstlisting}[style=bashstyle]
+$ sudo mkfs.vfat /dev/md0
+$ sudo mount /dev/md0 /mnt
+
+$ echo 'hello world' | sudo tee /mnt/test.txt
+\end{lstlisting}
+
+Next, we are going to simulate the failure of one of our disks:
+
+\begin{lstlisting}[style=bashstyle]
+$ sudo mdadm --detail /dev/md0
+    ...
+    Number   Major   Minor   RaidDevice State
+       0       7        0        0      active sync   /dev/loop0
+       1       7        1        1      active sync   /dev/loop1
+
+$ sudo mdadm --fail /dev/md0 /dev/loop0
+
+$ sudo mdadm --detail /dev/md0
+    ...
+    Number   Major   Minor   RaidDevice State
+       -       0        0        0      removed
+       1       7        1        1      active sync   /dev/loop1
+
+       0       7        0        -      faulty   /dev/loop0
+
+$ cat /mnt/test.txt
+    hello world
+\end{lstlisting}
+
+As we can see, the RAID array still functions even though one of the backing
+disks was marked as having failed. We can even go a set further and remove the
+failed disk from the array, destroy the loopback device and delete the backing
+storage file in order to confirm this.
+
+\begin{lstlisting}[style=bashstyle]
+$ sudo mdadm --remove /dev/md0 /dev/loop0
+$ sudo losetup -d /dev/loop0
+$ rm disk-01.img
+
+$ cat /mnt/test.txt
+    hello world
+\end{lstlisting}
+
+Finally, use the \textbf{mdadm --stop} command to disable the RAID array and
+clean up by detaching the other loopback device and removing the backing storage
+file. Note that neither the loopback devices nor the RAID array are persistent
+between reboots, so you can forgo the cleanup process if you want.
+
