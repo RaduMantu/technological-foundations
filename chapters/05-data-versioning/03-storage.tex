@@ -1,0 +1,181 @@
+\section{Data storage reliability}
+
+Ensuring that data remains available despite hardware failure, power outages and
+corruption (intentional or not) is a critical aspect of modern computing. Most
+storage devices have built-in measures such as \textbf{Error Correction Codes
+(ECC)}. These are mathematical algorithms that add redundant information to
+stored or transmitted data that permit detecting and sometimes correcting the
+errors. These mechanisms are designed to account for for physical defects
+manifested either as early as during the manufacturing process, or as a result
+as repeated use over a prolonged duration. Think how CDs were still usable
+even after suffering scratches on its surface, up to a certain point. Another
+limitation of ECCs is that the quantity of corrupted data that can be identified
+as such is proportional to the amount of redundant information that must be
+stored. Although optimizations exist, the manufacturer must account for only a
+subset of alteration patterns (e.g., bursts of corrupted bits, periodic single
+bit flips, etc.) that is characteristic of the storage / communication medium.
+For more information on this, see how \textbf{Cyclic Redundancy Codes (CRC)} are
+used to ensure critical data integrity \cite{koopman2015selection}. In this
+lesson we are going to explore additional measures that can be implemented as
+users, regardless of the underlying storage technology.
+
+\subsection{RAID arrays}
+
+\textbf{RAID} stands for \textbf{Redundant Array of Independent Disks} and is a
+technology that combines multiple physical disks into a single logical unit to
+improve data accessibility and provide additional redundancy. Although there are
+a number of strategies that can be applied for replicating data across disks,
+the operation itself is fairly simplistic. As a result, RAID can be implemented
+either in software or in hardware. Software RAID arrays can be managed with
+tools such as \href{https://www.man7.org/linux/man-pages/man8/mdadm.8.html}
+{mdadm} and are easier to experiment with. Meanwhile, hardware implementations
+are more often encountered in server-grade equipment as a means of reducing the
+number of I/O operations performed by the operating system and instead deferring
+them to a separate controller. This RAID controller is usually so simple that it
+can be implemented even in \textbf{Network Attached Storage (NAS)} expansion
+boards for the Raspberry Pi, such as the
+\href{https://wiki.geekworm.com/NASPi_Gemini_2.5}{NASPi Gemini}. The most types
+of RAID arrays (also known as RAID levels) that you may encounter as as
+follows:
+
+\begin{itemize}
+    \item \textbf{RAID 0 (Striping):} The data is split across two or more disks
+          without any redundancy or fault tolerance. As a result, losing one
+          drive will cause the entire array to fail. This configuration is meant
+          to maximize speed, when the I/O speed of a single drive represents
+          the bottleneck. Alternatively, it can also be used to create a single
+          cohesive drive from multiple backing storage devices. If this is your
+          intended purpose for RAID 0, we recommend the
+          \href{https://wiki.archlinux.org/title/LVM}{Logical Volume Manager
+          (LVM)} as an alternative. If you do use RAID 0, note that even though
+          you can add disks of different sizes, the configuration will be
+          limited by the size of the smallest disk. In other words, the
+          effective size will be determined by the number of disks times the
+          size of the smallest disk. This is because in RAID 0, each backing
+          storage device must contribute equally.
+
+    \item \textbf{RAID 1 (Mirroring):} The data is duplicated across two or
+          more disks. If one disk fails, the data will remain accessible. The
+          downside of this array type is that it has a 100\% storage overhead.
+          Similarly to RAID 0, the effective storage space is determined by the
+          capacity of the smallest disk added to the array. RAID 1 also provides
+          good read performance since the data is duplicated across two or more
+          storage devices but has lower write performance since this latter
+          operation needs to be doubled.
+
+    \item \textbf{RAID 5 (Striping + Parity):} The data is stored between three
+          or more disks, together with parity information for blocks of data.
+          If a single drive is lost, the data can still be reconstructed based
+          on the parity information stored on the other disks. However, losing
+          more than one drive would be catastrophic. Although not specifically
+          mentioned here, RAID 4 is very similar to this type of array but
+          differs in the way it uses a dedicated drive for parity storage. This
+          strategy puts excessive stress on that singular drive that results in
+          more frequent failure. Because RAID 5 distributes the parity
+          information across all drives, it offers a more balanced approach and
+          is more common.
+
+    \item \textbf{RAID 6 (Striping + Double Parity):} Similar to RAID 5 but uses
+          two blocks of parity data instead of one. This increases the number
+          of duplicate write operations from 2 to 3 and the minimum number of
+          drives from 3 to 4 but offers higher redundancy than RAID 5 and can
+          survive two disk failures.
+
+    \item \textbf{RAID 10 (Mirroring + Striping):} A combination of RAID 1 and
+          RAID 0. The data is first mirrored, and then split between multiple
+          disks. This type of array requires at least 4 disks but 50\% of that
+          storage is needed for duplicate data. RAID 10 is guaranteed to survive
+          a minimum of one drive failure and a maximum of $N / 2$ where $N$ is
+          the total number of drives. This depends on whether the failures
+          occur across different mirrored pairs or not. The worst case scenario
+          would be if one disk fails and is followed by the one used for
+          mirroring before the data could be re-duplicated on a healthy new
+          drive.
+\end{itemize}
+
+Note that we skipped a few types of RAID arrays (e.g., 2-4). This technology
+was first proposed in the '80s and most research has already been done in the
+'90s \cite{chen1994raid}, with the exception of some improvements for SSDs
+\cite{balakrishnan2010differential}. The previously listed types of arrays are
+those most commonly used today. Meanwhile, types 2-4 for example have been
+essentially deprecated by RAID 5 and 6.
+
+\subsection{File systems}
+
+Most users don't pay much attention to the file system that they use. Windows
+users most commonly use the \textbf{New Technology File System (NTFS)} while
+Linux users usually have the \textbf{Fourth Extended Filesystem (ext4)}. In
+most cases, these are not informed choices, but the recommended defaults of the
+operating system or distribution. These defaults are optimized for
+general-purpose workloads but offer limited additional features. For example,
+SUSE uses the \textbf{B-tree filesystem (Btrfs)} in their
+\href{https://links.imagerelay.com/cdn/3404/ql/ba9f00318526433b96c5f1f7a46fff8a/SLE-Micro-Data-Sheet.pdf}
+{Linux Micro} enterprise distribution to enable rollbacks if certain updates
+break the system and prevent it from booting. The following are some of the
+more prominent file systems in use today. Note however that new custom file
+systems are still being developed in-house for specific purposes.
+
+\begin{itemize}
+    \item \textbf{File Allocation Table (FAT):} Lightweight and fast for
+          small storage devices. Provides no integrity guarantees and has
+          poor performance for operations involving large files. This is mostly
+          attributed to fragmentation issues that arise after extended use and
+          numerous file additions and deletions. Its main advantage aside from
+          the low overhead is that is universally supported by any device.
+
+    \item \textbf{New Technology File System (NTFS):} A proprietary file system
+          developed by Microsoft in the '90s to address the limitations of FAT.
+          For many years, there was no significant NTFS support in the Linux
+          kernel and users had to employ an user-space alternative based on
+          \href{https://www.kernel.org/doc/html/latest/filesystems/fuse.html}
+          {FUSE} called \href{https://wiki.archlinux.org/title/NTFS-3G}{NTFS-3G}.
+          In 2021, an NTFS driver with support for journaling, \textbf{Access
+          Control Lists (ACL)}, compression, etc. has been added but the tooling
+          outside NTFS-3G is still lacking. Although NTFS has alleviated the
+          fragmentation problem of FAT, it is still present and still requires
+          periodic defragmentation. This process is being performed
+          automatically by modern Windows operating systems, no longer requiring
+          human intervention such as in the Windows XP days.
+
+    \item \textbf{Fourth Extended Filesystem (ext4):} The default choice on most
+          Linux-based systems. This file system mitigates the issue of
+          fragmentation by delaying disk writes until a \textbf{flush} operation
+          is specifically demanded. This allows it to aggregate more data in a
+          single \textbf{extent} (i.e., a descriptor for a contiguous block
+          range of up to 128MB) and also analyzes recent file activity to
+          optimize the block placement. Additionally, ext4 has a journaling
+          system that logs all intended changes before actually performing them.
+          This allows the file system to recover to an extent from data
+          corruption and from unexpected shutdowns or crashes while it is
+          still mounted.
+
+    \item \textbf{B-tree filesystem (Btrfs):} A modern file system that has
+          been significantly improved in recent years. By implementing a
+          \textbf{Copy-on-Write (CoW)} system, it guarantees that data is
+          never written in-place. In other words, changes made to a file are
+          stored at a different location in case a rollback is necessary. Aside
+          from enabling the creation of snapshots, this system also prevents
+          partial writes during crashes. Although it theoretically reduces
+          wear on SSDs, these should already have wear-leveling implemented in
+          their firmware as the standard demands, but this is not always the
+          case. The Linux driver for Btrfs provides built-in support for RAID
+          array types discussed previously, splitting partitions in sub-volumes
+          (that ease the process of creating back-ups), and inline compression
+          using zlib, zlo, zstd, etc. Additionally, Btrfs allows dynamic
+          partition resizing and implements block de-duplication (i.e., merging
+          identical blocks of data into one) for space-constrained systems.
+
+    \item \textbf{Zettabyte File System (ZFS):} Originally developed by Sun
+          Microsystems, its inclusion in the Linux kernel was problematic for
+          the longest time due to licensing issues with Oracle. Similarly to
+          Btrfs, it implements CoW but also has its own proprietary RAID array
+          type called \textbf{RAID-Z} that duplicates data (RAID 0) and adds
+          parity information for redundancy (RAID 5/6) but utilizes 256-bit
+          checksums (e.g., SHA-256) calculated over blocks of data and metadata
+          to detect errors, unlike the traditional RAID systems that use more
+          rudimentary error detection techniques. ZFS can also merge multiple
+          devices into a single cohesive \textit{"Storage Pool"} like LVM, has
+          transparent compression and de-duplication support, and can create
+          either read-only or write-only snapshots.
+\end{itemize}
+
