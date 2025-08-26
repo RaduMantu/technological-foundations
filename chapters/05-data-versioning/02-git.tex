@@ -70,12 +70,12 @@ function takes an arbitrary amount of data and outputs a fixed-size bit array
 that is representative of the input. Normally, one would be weary of collisions:
 if the function's domain is virtually infinite and the co-domain is not only
 finite but rather small in comparison, wouldn't it be possible to create two
-commits with the same digest? Possible – yes, likely – no. Git uses SHA1, a
+commits with the same digest? Possible - yes, likely - no. Git uses SHA1, a
 \href{https://en.wikipedia.org/wiki/Cryptographic_hash_function}{cryptographic
 hash function}. What makes a cryptographic hash function so special is that it
 provides certain guarantees. For example, it should be impossible to calculate
 potential messages from a digest (meaning that the function is non-invertible).
-Moreover, any change in the input – no matter how small, should change the hash
+Moreover, any change in the input - no matter how small, should change the hash
 value so extensively that the new value and the old should appear uncorrelated.
 Consequently, being able to craft a commit such that it's not only
 comprehensible, but also creates a certain desired digest is so unlikely that it
@@ -150,7 +150,7 @@ Stallman} pioneered concepts known today as \textbf{free software} and
 the end user can modify and adapt it for whatever purpose, profit included. In
 order for this to happen, the user must have ultimate control over the software
 in question, which implies access to the source code. So, for a piece of
-software to become “free software” it must include a public license such as the
+software to become "free software" it must include a public license such as the
 GNU General Public License, MIT license, etc. These licenses waive part of the
 author's rights and and grants them to the recipient of the software. Almost all
 free-software licenses contain a copyleft provision. This provision states that
