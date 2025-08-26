@@ -2,11 +2,249 @@
 
 \section{Practical exercises}
 
+\subsection{Basic git operations}
+
+A git repository is usually mirrored on a remote server in order for you to
+have a backup and for others to be able to access your changes. However, this
+is not a hard requirement. You can just as well start off with a standalone
+git repository and only later add a remote server to sync to.
+
+Let's start by creating an empty directory for our project and initializing it
+as a git repository.
+
+\begin{lstlisting}[style=bashstyle]
+$ mkdir first-git-project
+$ ch first-git-project
+
+$ git init -b master
+
+$ ls -la
+\end{lstlisting}
+
+As you can see, by running \texttt{git init}, we have created a \textit{.git/}
+hidden subdirectory. This subdirectory is used by \texttt{git} for project state
+management and should very rarely be interacted with by the user, manually.
+
+Try adding some content to this repository. Either a script, a C/C++ program or
+just a random media file that you have laying around. Use
+\href{https://man.archlinux.org/man/git-add.1}{git add} to include the new
+file(s) in the repository index and
+\href{https://man.archlinux.org/man/git-commit.1}{git commit} to record the
+changes.
+
+At this point, you will be met with an error requiring your to configure a
+user name and email for this project. This can be done on a per-project basis
+or globally (by specifying the \texttt{--global} flag) so that you don't need
+to repeat this setup in the future:
+
+\begin{lstlisting}[style=bashstyle]
+$ git config user.name  'John Doe'
+$ git config user.email 'john.doe@proton.me'
+
+# try again to perform the commit
+$ git commit
+\end{lstlisting}
+
+This will automatically open a text editor where you will have to write a
+commit message documenting what you've changed. The first line will be the title
+of the commit. Any additional text is optional and is used to document the
+changes more thoroughly but should not exceed ~10 lines. As you can probably
+note, any line prefixed with a \texttt{\#} symbol is a comment. Once you save
+and exit, the commit will be finalized.
+
+Run \texttt{git log} to view the commit history and \texttt{git status} to make
+sure that the added file is no longer in the staging area.
+
+\subsection{Adding a remote}
+
+Create an account of \href{https://github.com/}{github.com} and then create an
+empty repository. The name may differ from that of the directory you created
+earlier.
+
+Consider adding your SSH public key to GitHub (\href{https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account}{instructions here})
+in order to automatically authenticate yourself when cloning or pushing from
+your repositories. If you don't have a SSH keypair already created, see the
+documentation for \href{https://man.archlinux.org/man/ssh-keygen.1}
+{ssh-keygen}.
+
+Now, copy your repository URL for SSH cloning (e.g.,
+\texttt{git@github.com:USERNAME/first-git-project}) and add it as a remote:
+
+\begin{lstlisting}[style=bashstyle]
+# from within a (sub)directory of your repository
+# URL = what you copied earlier
+$ git remote add origin URL
+$ git push -u origin master
+\end{lstlisting}
+
+We have just added a remote called \textbf{origin} and pushed our branch called
+\textbf{master}, thus creating a copy with the same name on the remote. The name
+\textbf{origin} is special in that it is the default in many git operations. In
+practice, you can have \textit{multiple} remotes. This can be helpful if you
+regularly fetch changes from one remote and integrate them in another remote.
+However, this workflow is not something you will usually encounter.
+
+If you are working with other people on the same repository, remember to
+\href{https://man.archlinux.org/man/git-pull.1}{git-pull} regularly so that you
+don't diverge too far from each other.
+
+\subsection{Worktrees}
+
+We have previously discussed the concept of \textit{branches} in git. Normally,
+you would create a new branch with \href{https://man.archlinux.org/man/git-branch.1}
+{git branch} and then switch to it using \href{https://man.archlinux.org/man/git-checkout.1}
+{git checkout}. By checking out a different branch, what happens is that the
+state of the project is rolled back to the nearest common commit and then the
+commits from the target branch will be applied sequentially. Switching between
+branches this way can become very messy, especially if you have many unstaged
+changes or additions, which you would need to add to a
+\href{https://man.archlinux.org/man/git-stash.1}{git stash}.
+
+For this reason, \href{https://man.archlinux.org/man/git-worktree.1}{git
+worktrees} were added. Worktrees allow you to maintain branches in different
+directories. So to switch between branches, instead of \texttt{git checkout}
+you would just \texttt{cd /the/other/branch}.
+
+Create a new \textbf{test} branch and create a worktree for it:
+
+\begin{lstlisting}[style=bashstyle]
+# create the new branch (locally)
+$ git branch test
+
+# initialize a separate directory with this branch
+$ git worktree add ~/test test
+\end{lstlisting}
+
+Now we have a added another subdirectory in our home called \textit{test/}.
+Whenever we enter it, we can see that we are working on the \textbf{test} branch
+instead of the \textbf{master} branch. However, the worktree does not have a
+\textit{.git/} directory, but instead a \textit{.git} file that references the
+state directory of the original repository. This is an optimization that makes
+worktrees more easily manageable than just cloning the repository again.
+
+\begin{lstlisting}[style=bashstyle]
+$ cd ~/first-git-project#
+$ git branch -a
+    * master
+    + test
+
+$ cd ~/test
+$ git branch -a
+    + master
+    * test
+
+$ cat .git
+    gitdir: /root/first-git-project/.git/worktrees/test
+\end{lstlisting}
+
+In the \texttt{git branch} output, the current branch is prefixed with a
+\textbf{*} symbol and related worktrees are marked with a \textbf{+}.
+
+\subsection{Rebasing}
+
+Try adding two new commits to your \textbf{test} branch. One of them should
+contain a \textit{README.md} file (written in
+\href{https://www.markdownguide.org/basic-syntax/}{markdown}) that summarily
+describes your repository. The other should be a
+\href{https://www.gnu.org/licenses/gpl-3.0.en.html#license-text}{GPLv3 license
+text}.
+
+Now switch back to your \textbf{master} branch directory. If you run
+\texttt{git log}, you will see that you still only have your inital commit.
+However, if you run \texttt{git log test}, you can see that the \textbf{test}
+branch is ahead by two commits. It is common to have a development branch that
+is separate from the \textbf{master}. However, at some points you need to
+import the changes to the master branch so that you can push them to the remote.
+Other developers will not keep track of your individual test branches and are
+instead interested only in the main branch.
+
+The cleanest method of applying changes from another branch onto the current
+one is \href{https://man.archlinux.org/man/git-rebase.1}{git rebase}:
+
+\begin{lstlisting}[style=bashstyle]
+$ cd ~/first-git-project#
+$ git rebase test
+
+# check that the commits were applied
+$ git log
+\end{lstlisting}
+
+At certain times, you will realize that you've made a mistake in one of your
+commits (that you have not pushed yet) and you will want to correct it. Let's
+say that you forgot to add a disclaimer in your \textit{README.md} file. Make
+a change to it, and commit it.
+
+\begin{lstlisting}[style=bashstyle]
+$ vim README.md
+$ git add README.md
+
+# you can specify the commit message as a flag argument
+$ git commit -m 'fixing my mistake'
+\end{lstlisting}
+
+Although this fixes things, we do not want to pollute our commit history with
+useless commits. So, we are going to use git rebase in \textit{interactive}
+mode.
+
+\begin{lstlisting}[style=bashstyle]
+$ git rebase -i HEAD~3
+\end{lstlisting}
+
+This command takes the last three commits (\textbf{HEAD} is the current commit)
+and opens a text editor with the following contents (and some instructions):
+
+\begin{lstlisting}
+pick 3083002 Added a readme
+pick 560191e Added a license
+pick 31d8a96 fixing my mistake
+\end{lstlisting}
+
+The first word of each line is a command that will be applied to a commit.
+The second word is the fingerprint of the commit from the git log. The remaining
+words are the commit title and are there to help us identify the commit in
+question. Once we close the editor, these commands will be executed
+sequentially, from top to bottom.
+
+If we want to \textit{reorder} some commits, all we have to do is swap the lines
+in this file. In our case, we can place the README fix right after its addition
+to the index:
+
+\begin{lstlisting}
+pick 3083002 Added a readme
+pick 31d8a96 fixing my mistake
+pick 560191e Added a license
+\end{lstlisting}
+
+However, we can go a step further. We can \textit{squash} the two commits
+together by using the \textbf{fixup} command. This will merge our fix into the
+previous commit while keeing the first's commit message. But let's say that we
+want to acknowledge in our commit message that the change was also included.
+This we can achieve by using \textbf{reword} on the first commit:
+
+\begin{lstlisting}
+reword 3083002 Added a readme
+fixup  31d8a96 fixing my mistake
+pick   560191e Added a license
+\end{lstlisting}
+
+Once we exit the editor, we will immediately be prompted to change the commit
+message for the \texttt{3083002} commit. Use \texttt{git log} to confirm the
+changes. Keep in mind two things:
+
 \begin{itemize}
-    \item process of creating a git repository and pushing changes
-    \item git rebase
-    \item git worktrees
-    \item solving merge conflicts
+    \item Be careful how you reorder your commits. Each commit contains deltas
+          between the previous version of each included file and the one you
+          commited. Absurd reorders may lead to conflicts that you will need to
+          sort out (or abort the rebase operation).
+
+    \item Usually, you will only want to do interactive rebases on commits that
+          have not been pushed to a remote. Alternatively, you will need to
+          \href{https://stackoverflow.com/questions/5509543/how-do-i-properly-force-a-git-push}
+          {force push} your changes. If you are working alone, this is not a
+          problem. However, if you have collaborators or users that cloned your
+          public repository, your changes may break the consistency of their
+          history. As a result, it falls on \textit{everyone else} to fix their
+          own repository history to match \textit{your} changes.
 \end{itemize}
 
 \subsection{Setting up a RAID array}
