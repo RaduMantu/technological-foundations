@@ -2,18 +2,85 @@
 
 \section{Practical exercises}
 
-Ideas:
-\begin{itemize}
-    \item Collect data with vmstat while compiling Linux and plot them.
+\subsection{Disk usage visualization}
 
-    \item Bar plot with disk usage of different directories based on du output.
+The \href{https://man.archlinux.org/man/du.1}{du} command can be used to
+estimate the disk utilization of a file, or recursively scan a directory. When
+using this command, you need to note that it does not differentiate between
+cohesive files and \href{https://wiki.archlinux.org/title/Sparse_file}{sparse
+files}. Additionally, \href{https://linuxhandbook.com/hard-link/}{hard links}
+can trick you into thinking that your disk utilization can exceed the actual
+storage space.
 
-    \item Plot with two Oy axes (left and right side).
+These are a few caveats that you would normally need to keep in mind, but for
+this task we are going to focus on the plotting aspect. Go in your home
+directory and use \texttt{du} recursively (see the \texttt{-s} flag) on all
+subdirectories, but also any files residing directly in your home. Output their
+size in bytes instead of kilobytes, then use the
+\href{https://man.archlinux.org/man/sort.1}{sort} command to sort the items in
+reverse numerical order, based on size (meaning largest first).
 
-    \item Data extraction with pandas and more advanced plotting.
+Write a Python script that takes this as input and generates a
+\href{https://pythonguides.com/matplotlib-plot-bar-chart/}{bar plot}
+illustrating how much space each file and subdirectory in your home takes up.
 
-    \item Dynamic plot.
-\end{itemize}
+\subsection{CPU usage visualization}
+
+As you know, your CPU has multiple cores. To find out exactly how many, you can
+run the \href{https://man.archlinux.org/man/nproc.1}{nproc} command. In this
+task we are going to run CPU intensive workloads on \textit{specific} cores and
+create a bar plot representing the percentage of time each core spent executing
+user level code (i.e., applications), system level code (i.e., kernel tasks
+unrelated to servicing hardware peripherals) and hardware interrupts.
+
+To gather this data, you can use the
+\href{https://man.archlinux.org/man/mpstat.1}{mpstat} command. To
+perform CPU-intensive work, take a look at the
+\href{https://man.archlinux.org/man/stress.1}{stress} command. If left as it is,
+the kernel's scheduler will most likely bounce the \texttt{stress} process from
+one CPU core to another. Try using the
+\href{https://man.archlinux.org/man/taskset.1}{taskset} command to bind multiple
+\texttt{stress} workers to \textit{odd} CPU cores.
+
+\subsection{Dynamic plotting}
+
+Make sure that you have completed the previous task before starting this one.
+
+\texttt{mpstat} can either report momentary statistics or it can do so
+periodically. Try alternating the CPU load between even and odd cores on your
+processor (see \href{https://man.archlinux.org/man/timeout.1}{timeout} and
+\href{https://man.archlinux.org/man/sleep.1}{sleep}) and visualize these
+statistics with a
+\href{https://holypython.com/python-visualization-tutorial/creating-bar-chart-animations/}
+{dynamic bar plot}.
+
+\subsection{Pandas introduction}
+
+Pandas is a Python library used in data manipulation and analysis. It is based
+on \texttt{numpy} but introduces certain data structures such as
+\href{https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html}
+{DataFrames} for managing tabular data, or
+\href{https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html}
+{Series} for handling 1D arrays (especially time series). Pandas also offers
+tools for interacting with different storage formats such as CSV, Excel, SQL
+databases, etc.
+
+We recommend going over the official
+\href{https://pandas.pydata.org/pandas-docs/stable/user_guide/10min.html}{10
+minutes to pandas} crash course and keeping this
+\href{https://github.com/pandas-dev/pandas/blob/main/doc/cheatsheet/Pandas_Cheat_Sheet.pdf}
+{cheat sheet} at hand. Note that Pandas also has built-in plotting support,
+even though it's based on \texttt{matplotlib}. See the
+\href{https://pandas.pydata.org/pandas-docs/stable/user_guide/visualization.html}
+{chart visualization} chapter in the official documentation and also look at
+the \href{https://pandas.pydata.org/pandas-docs/stable/user_guide/cookbook.html#cookbook-plotting}
+{cookbook} chapter for practical examples.
+
+Try downloading \href{https://www.kaggle.com/datasets/themlphdstudent/countries-population-from-1955-to-2020}
+{this kaggle dataset} containing per-country population statistics between
+1955 and 2020 and plotting the demographic changes that can be extracted from
+this data. Start with your own country and then perform a comparison with
+immediate neighbours.
 
 \subsection{Radio spectrogram}
 
