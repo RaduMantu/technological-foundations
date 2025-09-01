@@ -1,0 +1,205 @@
+\newpage
+
+\section{Practical exercises}
+
+\subsubsection{GNU Privacy Guard (key generation)}
+
+\href{https://man.archlinux.org/man/gpg.1.en}{GNU Privacy Guard (GPG)} is an
+implementation of the \href{https://www.rfc-editor.org/rfc/rfc4880}{OpenPGP}
+standard for encrypting and decrypting data. In this task, we are going to use
+\textbf{gpg} to encrypt and sign certain data. But first, we need to generate
+a key pair.
+
+\begin{lstlisting}[style=bashstyle]
+$ gpg --gen-key
+\end{lstlisting}
+
+This command will use some default settings to generate you a public key pair.
+You will still be prompted to provide a name and email address to bind to this
+key. If you want more control over the process, you can use the
+\textbf{-{-}full-gen-key} flag instead.
+
+After generating the two keys, \textbf{gpg} stores them in your home directory,
+in \textit{~/.gnupg/}. Each private key is stored as a separate file in the
+\textit{private-keys-v1.d/} subdirectory (as of version 2.1 and later).
+Meanwhile, the public key is added to a key ring represented by the
+\textit{pubring.kbx} file. This file represent a database (whose format is
+specific to GPG) that contains the public keys that are associated to your own
+private keys, as well as all other public keys that you import from other
+people.
+
+Note that these keys are somewhat bound to your user, since they reside in your
+home directory. If you mistakenly run \textbf{sudo gpg} because you do not have
+read permissions on a file that you want to encrypt for example, \textbf{gpg}
+will access the key ring of the \textit{root} user instead of your own. There
+are flags for overriding the default public / private key rings but this is a
+very common mistake that people make.
+
+Before moving to the next task, look in the
+\href{https://man.archlinux.org/man/gpg.1.en}{gpg man page} and find the flag
+that lists your private keys. Notice that your key has a 20-byte hexstring that
+uniquely identifies it:
+
+\begin{lstlisting}[style=bashstyle]
+pub   ed25519 2025-09-01 [SC]
+50666D02F76792D89CDDCA63EE345DF35B9FD4BF
+uid       [ultimate] Student (test key) <student@d4s.com>
+sub   cv25519 2025-09-01 [E]
+\end{lstlisting}
+
+This hexstring is called the key's fingerprint and is used in case the name
+or email that you provided are insufficient to differentiate the target key from
+the rest.
+
+Next, find the flag that lists the public keys in your key ring. You will most
+likely have more than one if \textbf{gpg} was used by your package manager to
+verify the integrity and authenticity of your installed software. Try providing
+the name or email associated to your private key as a positional argument.
+Notice that the fingerprint of the public key is identical to its private
+counterpart.
+
+\subsubsection{GNU Privacy Guard (encryption)}
+
+In GPG, messages are usually signed with the public key in order for the holder
+of the private key to decrypt them. The reverse does not make much sense since
+anyone could decrypt the message (we assume that the public key is available to
+anyone).
+
+Try to \textbf{encrypt} a file for a certain \textbf{recipient} to receive. The
+output will be in a binary OpenPGP format bu can be made ASCII readable using
+the \textbf{-{-}armor, -a} flag. Additionally, you can specify the output file
+name by using \textbf{-{-}output, -o}. Otherwise, it will default to the name of
+the input file with a \textit{.gpg} appended to it.
+
+Next, try to decrypt the file. Notice how you are not prompted for the private
+key fingerprint. During the encryption process, \textbf{gpg} added metadata to
+the output file. This metadata includes the fingerprint of the recipient. If
+you've generated a binary output instead of an ASCII armored one, you can use
+\textbf{hexdump -C} to inspect it. Try searching for the first 2-3 bytes of the
+key's fingerprint in the output.
+
+As a final challenge, try encrypting the file with a \textbf{symmetric}
+algorithm that is not bound to a stored key but instead to a passphrase that you
+will provide. Investigate why you are not prompted for the same passphrase when
+you try to decrypt that file. Try to remedy this problem.
+
+\textbf{Hint:} GPG caches your passphrases for a certain time to avoid pestering
+you with prompts. Your key rings are also protected by passphrases. Imagine
+performing a bulk encryption on thousands of files and being prompted for your
+password on each operation.
+
+\subsubsection{GNU Privacy Guard (exchanging keys)}
+
+For this task, try working with a teammate. If you have none, simulate it by
+running a Docker container:
+
+\begin{lstlisting}[style=bashstyle]
+# your new best friend
+$ docker run -ti ubuntu:24.04
+
+# inside the container
+$ apt update && apt install -y gpg
+\end{lstlisting}
+
+Each of you should \textbf{export} your public key and store it in a file
+(e.g., \textit{student.key}). Trade it with one another. If you are using the
+Docker setup, use this method to copy files between your host and the container:
+
+\begin{lstlisting}[style=bashstyle]
+# find out the container's ID or Name
+$ docker ps
+CONTAINER ID   IMAGE           ...   NAMES
+2c2030fbe37e   ubuntu:24.04          xenodochial_allen
+
+# copy your key to the container
+$ docker cp student.key 2c2030fbe37e:/root/
+
+# copy the partner's key to your host
+$ docker cp 2c2030fbe37e:/root/john.key .
+\end{lstlisting}
+
+Once done with the exchange \textbf{import} each other's public key. Then,
+encrypt a message for the other person using their recently received key.
+Exchange the encrypted messages and decrypt the one you receive.
+
+If you ever want to remove your partner's key from your key ring, you can use
+the \textbf{-{-}delete-keys} flag.
+
+\subsubsection{GNU Privacy Guard (signatures)}
+
+Although you managed to decrypt the message, anyone with your public key could
+have sent it. We have no guarantee that it originated from your partner.
+
+Remedy this by creating a \textbf{detached signature} of the encrypted file
+using your own private key (specified as the \textbf{local user}). Exchange
+file signatures and try to \textbf{verify} them.
+
+The signature of the encrypted file was generated with your partner's private
+key and was validated with the associated public key that you've previously
+imported to your key ring.
+
+For extra practice, try performing the encryption and singing in one go. GPG
+has a flag for that as well. During the decryption phase, the signature
+verification will be done automatically.
+
+\subsubsection{SOCKS5 protocol}
+
+\href{https://www.rfc-editor.org/rfc/rfc1928}{Socket Secure v5 (SOCKS5)} is a
+protocol dating back to 1996, at least in its current form. Back then it was
+used a method of encapsulating traffic that firewalls were not configured to
+understand, and therefore would drop. The need to support new network protocols
+was obvious but at the same time, one could not simply create backdoors into
+the internal network. This, SOCKS5 also implements a robust authentication
+mechanism (that we are not going to touch).
+
+In this exercise, you will have to install and start
+\href{https://man.archlinux.org/man/tor.1}{The Onion Ring (TOR) service} that
+will listen for incoming connections on \textbf{local port 9050} (by default).
+These connections will be routed via a virtual circuit through the Internet.
+This virtual circuit is randomized every few minutes and is meant to maintain
+your anonymity.
+
+In your browser, you should be able to find a \textbf{proxy} menu in its
+settings page and enable a SOCKS5 proxy on \textbf{127.0.0.1:9050}.
+Alternatively, you can use the
+\href{https://man.archlinux.org/man/torsocks.1.en} proxy to hook the
+\href{https://man.archlinux.org/man/socket.2.en}{socket()} and
+\href{https://man.archlinux.org/man/connect.2.en}{connect()} system calls and
+encapsulate the transport layer (usually TCP) payload through the SOCKS
+protocol. Take for example the following command for finding out your public IP
+address:
+
+\begin{lstlisting}[style=bashstyle]
+$ curl -4 ifconfig.me
+\end{lstlisting}
+
+This will initiate a connection to an HTTP server running on port 80 that will
+respond with your public IP, as it sees it. The protocol stack in this case will
+be \texttt{[ Ethernet | IPv4 | TCP | HTTP ]}. If we run the same command with
+\textbf{torsocks}, it will instead replace the destination IP and port with
+\textbf{127.0.0.1:9050} and the protocol stack will become \texttt{[ Ethernet
+| IPv4 | TCP | SOCKS5 | HTTP ]} (probably without Ethernet since we are
+targeting the localhost). The SOCKS5 layer will hold the true destination's
+IP address and port. A normal SOCKS5 server would initiate a separate connection
+to that endpoint but the \textbf{tor} service will instead route your traffic
+through multiple endpoints in the Internet, each consecutive host adding
+another layer of encryption.
+
+Use the \href{https://man.archlinux.org/man/whois.1}{whois} tool to find out
+what organization owns the IP address that is seen as your public IP. Perform
+this operation with the address returned with and without \textbf{torsocks}.
+Find out what country you are perceived as being from in both cases.
+
+\textbf{Note:} You can regenerate the TOR circuit manually by either restarting
+the \textbf{tor} service or by sending it a \texttt{SIGHUP} signal (as seen
+below). This operation is not meant to be performed repeatedly in a short time
+span!
+
+\begin{lstlisting}[style=bashstyle]
+$ sudo kill -s SIGHUP $(pidof tor)
+\end{lstlisting}
+
+As a bonus, if you have SSH access to a remote server (e.g., your home server),
+experiment with creating a SOCKS5 proxy via a SSH tunnel with its
+\textbf{dynamic application-level port forwarding (-D)} option.
+
