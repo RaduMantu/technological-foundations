@@ -92,15 +92,15 @@ showing how the radio signal frequency changes in time.
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=\textwidth,keepaspectratio]{figures/waterfall.png}
-    \caption{Spectrogram of radio signal.}
+    \includegraphics[width=\textwidth,keepaspectratio]{figures/waterfall-1.png}
+    \caption{Spectrogram of radio signal (different form our sample).}
     \label{fig:spectrogram}
 \end{figure}
 
 In Figure \ref{fig:spectrogram} we see what is called a waterfall plot. The
-signal that we recorded is comprised of multiple signals of \textit{specific}
+signal that we recorded is comprised of multiple other signals of \textit{specific}
 frequencies. Each line of pixels represents the amount of power each individual
-component exhibits in a limited timeframe. This information is encoded through
+component exhibits in a limited time frame. This information is encoded through
 the pixel color, that adheres to the
 \href{https://www.mathworks.com/help/matlab/ref/jet.html}{jet colormap} (i.e.,
 blue is weaker, red is stronger). In this plot we notice that there are a few
@@ -109,15 +109,19 @@ different radio stations. The small shifts in power distribution around these
 frequencies over time is how sound is encoded when transmitted to our radio
 devices.
 
+\textbf{Note:} The sample we are going to be working on is focused on a single
+radio station. We intentionally reduced the scope in order to keep the sample
+size (and the RAM consumption) within reasonable limits.
+
 \subsubsection{Parsing input data}
 
 In order to acquire this data, we used a
 \href{https://www.nuand.com/product/bladerf-xa9/}{bladeRF 2.0 micro xA9} SDR
 and \href{https://www.gqrx.dk/}{GQRX} for data visualization and acquisition on
-our host. We tuned our SDR to a frequency of 103.4MHz and used a sampling rate
-of 10MHz. The sampling rate determines how wide the frequency spectrum that
-we visualize can be. In this case, the Ox axis of our previous figure is defined
-between 103.4 ± 5MHz.
+our host. We tuned our SDR to a frequency of $101.3MHz$ and used a sampling rate
+of $1MHz$. The sampling rate determines how wide the frequency spectrum that
+we visualize can be. The Ox axis of our previous figure is defined between
+$103.4 \pm 5MHz$. In our sample, the range will be $101.3 \pm 0.5MHz$.
 
 SDRs usually work with complex sampling, also known as
 \href{https://pysdr.org/content/sampling.html}{In-phase Quadrature (I/Q)
@@ -125,33 +129,38 @@ sampling}. Instead of providing a real value representing the amplitude of the
 signal at a given time, this technique provides a number of benefits. These are
 not relevant to the exercise at hand but just to get an idea, if we were working
 with \textit{real} numbers instead of \textit{complex} numbers, we wouldn't be
-able to "see" frequencies at ±5MHz around our tuned radio frequency. Instead,
-we would only be able to see the positive half of the spectrum.
+able to \textit{"see"} frequencies at $\pm500kHz$ around our tuned radio
+frequency. Instead, we would only be able to see the positive half of the spectrum.
 
-Our particular SDR provides 4 bytes for each I/Q sample. The first two bytes
-represent the real component and the last two bytes represent the imaginary
-part. Each of these two bytes must be interpreted as \textbf{unsigned short}
-values. A value of 0x0000 represents the \textit{minimum} value that the SDR
-can record and 0xffff represents the \textit{maximum} value. The exact values
-do not necessarily interest us since we only want to observe differences between
-the presence and the lack of a signal. Information about the range of measurable
-values can be found in the data sheet of the SDR.
+GQRX saves raw I/Q data as \textbf{32-bit floating-point complex samples}. The
+first four bytes represent the real component and the last two bytes represent
+the imaginary part. The exact values do not necessarily interest us since we
+only want to observe differences between the presence of a signal and a lack
+thereof. Information about the range of measurable values can be found in the
+data sheet of the SDR.
 
 To start things off, read the data from the provided \textbf{binary file} and
-use the \texttt{struct} module to \textbf{unpack} the data into unsigned shorts.
-Create an array of \textbf{complex} values representing our samples. Note that
-python has built-in support for complex number representation (e.g.,
+use the \texttt{struct} module to \textbf{unpack} the data into floating point
+numbers. Create an array of \textbf{complex} values representing our samples.
+Note that Python has built-in support for complex number representation (e.g.,
 \texttt{1 + 2j}).
 
 \vskip .5cm
 
-\textbf{Tip \#1:} The sampling frequency that we used might have been a bit too
-high, resulting in a large amount of data. If you notice that you are running
-low on RAM while solving this exercise, consider employing
+\textbf{Tip \#1:} If you notice that you are running low on RAM while solving
+this exercise, consider employing
 \href{https://dspguru.com/dsp/faqs/multirate/decimation/}{signal decimation}.
 Effectively, you can select only every second, or fourth, or eighth, etc.
 sample. This will reduce the memory consumption but the width of the frequency
-spectrum will also be reduced by a factor of 2, 4, 8, and so on.
+spectrum will also be reduced by a factor of 2, 4, 8, and so on. To track the
+available memory, use the following command (in a different terminal). Avoid
+letting the \textbf{Mem - free} value drop to zero, even if you have
+\href{https://wiki.archlinux.org/title/Swap}{Swap Memory}.
+
+\begin{lstlisting}[style=bashstyle]
+# invoke the free command every second
+$ watch -n 1 free -h
+\end{lstlisting}
 
 \textbf{Tip \#2:} When you are done with certain data stored in a variable
 \textbf{x} let's say, consider running \textbf{del(x)} to free up the memory.
@@ -168,8 +177,8 @@ time domain to the frequency domain. This can be done using the
 {Fast Fourier Transform (FFT)}. The FFT takes a time series of complex numbers
 and outputs yet another series of complex numbers, but this new series will
 be in the frequency domain. The range of frequencies is determined
-\textit{solely} by the tuned frequency (103.4MHz) and the sampling frequency
-(10MHz if not decimated).
+\textit{solely} by the tuned frequency ($101.3MHz$) and the sampling frequency
+($1MHz$ if not decimated).
 
 At this point, we could compute the FFT on the entirety of our sampled signal.
 However, this will only show us the amount of power dissipated for each frequency
@@ -180,6 +189,18 @@ samples on which we apply the FFT. By shifting the window to the right, we
 advance in time but maintain a limited scope for our frequency analysis. The
 result of this operation will be an array of FFT outputs, each representing a
 \textbf{line} in our final plot.
+
+Note that the first element of the FFT's output corresponds to the central
+frequency ($F_t$) of $101.3MHz$. For an output of size $N$, the first $N / 2$
+elements correspond to the $[ F_t : F_t + F_s / 2 )$ range. Half of the sampling
+frequency ($F_s$) is also known as the
+\href{https://en.wikipedia.org/wiki/Nyquist_frequency}{Nyquist frequency}. The
+latter $N / 2$ elements of the FFT output wrap around the range of frequencies
+and represent $[ F_t - F_s / 2 : F_t )$. As a result, each FFT output must be
+rotated by $N / 2$ elements. This is such a common operation that there is even
+a \texttt{numpy} function called
+\href{https://numpy.org/doc/stable/reference/generated/numpy.fft.fftshift.html}
+{fftshift}. Makes sure to apply it to \textit{every} FFT output you obtain.
 
 \vskip .5cm
 
@@ -193,14 +214,14 @@ More lines, means more FFT function calls (which are expensive), means more time
 spent prototyping. Consider using a step value equal to the size of the window.
 
 \textbf{Tip \#3:} When choosing the FFT window size, remember that this will
-\textbf{not} affect the frequency visibility range. It will still be 103.4 ±
-5MHz regardless of your choice. What will be affected however is the precision.
+\textbf{not} affect the frequency visibility range. It will still be $101.3 \pm
+0.5MHz$ regardless of your choice. What will be affected however is the precision.
 If you compute a FFT on a small number of samples, let's say 100, then the range
-of frequencies that is determined by the sampling frequency (i.e., 10MHz) will
-be split into 100 "buckets" of 100kHz each. If two or more \textit{distinct}
+of frequencies that is determined by the sampling frequency (i.e., $1MHz$) will
+be split into 100 "buckets" of $10kHz$ each. If two or more \textit{distinct}
 signals fall withing the same "bucket", they will be represented as a single
-signal. If you decide to use 10,000 samples instead, you will have 1kHz buckets
-instead of 100kHz buckets, which may be enough for you to distinguish the two
+signal. If you decide to use 1,000 samples instead, you will have $1kHz$ buckets
+instead of $10kHz$ buckets, which may be enough for you to distinguish the two
 signals.
 
 \subsubsection{Post processing}
@@ -232,8 +253,9 @@ it is best to have a small step relative to the window size. Having a high
 overlap between consecutive windows helps maintain the cohesion of the data that
 we want to display. Finally, the window size itself should be as small as
 possible. If it's too large, we will eliminate relevant features from our data.
-However, if it's too small, the result will still contain noise. Start off with
-a value of 30 and see what works.
+However, if it's too small, the result will still contain noise. For a first
+attempt, try to generate the image without any averaging and decide for yourself
+if it is even necessary.
 
 \subsubsection{Plotting}
 
@@ -246,5 +268,14 @@ use used \texttt{jet} but there are
 alternatives. Also, use the \texttt{extent} argument to set the numeric ranges
 for the Ox and Oy axes. We've already mentioned what the frequency range is.
 The elapsed time for the signal measurement can be computed based on the number
-of samples and the sampling frequency.
+of samples, the sampling frequency, and the size of each sample (in bytes).
+
+The result should look something like this:
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth,keepaspectratio]{figures/waterfall-2.png}
+    \caption{Example output for the $F_s = 1MHz$ sample. Duration limited to $2s$.}
+    \label{fig:spectrogram}
+\end{figure}
 
