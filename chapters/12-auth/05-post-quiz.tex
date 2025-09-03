@@ -1,0 +1,63 @@
+\section{Post-lecture Quiz}
+\label{sec:sec:post-quiz}
+
+\subsection{Quiz Questions}
+
+\textbf{Question 1:} Which of the following best describes the relationship between symmetric and asymmetric encryption in a typical secure communication system?
+
+\begin{enumerate}
+    \item[A)] Asymmetric encryption is always used for all data transmission
+    \item[B)] Symmetric encryption is always used for all data transmission
+    \item[C)] \textbf{Asymmetric encryption is used for key exchange, then symmetric encryption is used for data transmission}
+    \item[D)] Both types are used simultaneously for the same data
+\end{enumerate}
+
+\textbf{Question 2:} In the context of digital certificates and PKI, what is the primary purpose of a Certificate Authority (CA)?
+
+\begin{enumerate}
+    \item[A)] To encrypt all network traffic
+    \item[B)] \textbf{To verify and digitally sign public key certificates, establishing trust in the public key}
+    \item[C)] To store private keys securely
+    \item[D)] To generate random encryption keys
+\end{enumerate}
+
+\textbf{Question 3:} What is the main security advantage of using SSH key-based authentication compared to password authentication?
+
+\begin{enumerate}
+    \item[A)] SSH keys are shorter and easier to remember
+    \item[B)] SSH keys provide faster connection speeds
+    \item[C)] \textbf{SSH keys eliminate the risk of password interception and provide stronger cryptographic authentication}
+    \item[D)] SSH keys work without any network connection
+\end{enumerate}
+
+\textbf{Question 4:} In the context of the Trusted Computing Base (TCB), why is it important to minimize the size of the TCB?
+
+\begin{enumerate}
+    \item[A)] To reduce system memory usage
+    \item[B)] To improve system performance
+    \item[C)] \textbf{To reduce the attack surface and limit the number of components that could compromise system security}
+    \item[D)] To make the system easier to understand
+\end{enumerate}
+
+\textbf{Question 5:} What is the primary difference between integrity and confidentiality in information security?
+
+\begin{enumerate}
+    \item[A)] Integrity is about speed, confidentiality is about accuracy
+    \item[B)] \textbf{Integrity ensures data has not been modified, while confidentiality ensures data is not disclosed to unauthorized parties}
+    \item[C)] Integrity is about authentication, confidentiality is about authorization
+    \item[D)] There is no difference between integrity and confidentiality
+\end{enumerate}
+
+\subsection{Answer Key}
+
+\begin{enumerate}
+    \item \textbf{C} - In practice, asymmetric encryption is used for secure key exchange (due to its key distribution advantages), and then symmetric encryption is used for the actual data transmission (due to its speed advantages).
+    
+    \item \textbf{B} - Certificate Authorities act as trusted third parties that verify the identity of certificate holders and digitally sign their public key certificates, creating a chain of trust in the PKI system.
+    
+    \item \textbf{C} - SSH key-based authentication uses cryptographic key pairs instead of passwords, eliminating the risk of password interception and providing much stronger authentication through public-key cryptography.
+    
+    \item \textbf{C} - The TCB contains all components critical to system security. Minimizing its size reduces the attack surface, meaning fewer components that could potentially be compromised to break system security.
+    
+    \item \textbf{B} - Integrity ensures data has not been tampered with or corrupted, while confidentiality ensures that sensitive information is not accessed by unauthorized individuals or systems.
+\end{enumerate}

@@ -1,0 +1,46 @@
+The notion of security has become increasingly important in recent years.
+The development of technology, along with a rapid increase in connectivity due to the Internet, has led to a rise in the number of cyber attacks.
+In the presence of technology and connectivity, digital data and confidential information can be available to a remote attacker, without the need for their physical presence near the attacked device.
+The growing interest in security comes from companies, users, and government entities for protecting digital data and IT infrastructures.
+
+Despite the growing interest in security, many concepts are relatively vague and misunderstood by the general public.
+Some information is too technical, others are exaggerated, and others are too theoretical.
+In this chapter, we aim to clarify the essential concepts related to security, with emphasis on computer system security, along with the main types of security perspectives of interest to every user: data security, access security, transfer security, and application security.
+
+We call a \textbf{secure computer system} a system that provides the expected results.
+In contrast, we call an insecure computer system a system that functions inadequately, meaning there are situations where the result is not correct or the system fails.
+When a system functions many times according to expectations, we cannot say with certainty that it is secure.
+It is possible that in a specific use case it may not function appropriately.
+For this reason, saying that a system is perfectly secure is a risky statement, given that it is quasi-impossible to guarantee that a system functions according to expectations for all use cases.
+
+We say that, in general, \textbf{the complexity of a system affects its security}.
+The more complex a system is, the harder it is to validate that for a large number of use cases, the system functions appropriately.
+The increase in system complexity leads to an increase in security risks against it.
+Security risks can appear at all levels of a system: they can be software problems, hardware problems, infrastructure problems, or configuration problems.
+These problems are risks that expose the system to attackers.
+An attacker will seek to exploit the system for their own benefit.
+
+A system that is attacked can suffer in three directions:
+\begin{enumerate}
+  \item \textbf{Loss of control}: the attacker holds control of the system being able to access private data, run malicious applications, or abuse other systems.
+  \item \textbf{Information theft}: critical information of a user (PIN code, private data) or of a company (access accounts, transaction information, source code) can be extracted by the attacker to be sold, for blackmail, or to extract money from bank accounts.
+  \item \textbf{Resource abuse}: the attacker hinders the system's operation or stops it, thus sabotaging a company's service and leading to image losses or market losses.
+\end{enumerate}
+
+An attacker can pursue one or more of these directions.
+An attacker's motivation is often financial, but it can also be political, they can be employed by a competing entity, or they can attack the system just for entertainment.
+There are also categories of well-intentioned people, so-called white-hat hackers (or ethical hackers), who attack a system to discover its problems which they then report to be corrected.
+
+In contrast to an attacker, the defender's perspective is to protect their data, prevent loss of control, and make the system as robust as possible.
+An essential difference between attacker and defender is that the attacker needs to find a single security problem (also called a security hole) while a defender must protect all possible holes in the system.
+A defender must consider both preventive mechanisms and reactive mechanisms: that is, mechanisms that prevent or hinder the attacker from generating an attack, respectively mechanisms that minimize or isolate damages in case of an attack.
+
+From these considerations, we say that security does not aim to create a secure system, something impossible to achieve, but rather \textbf{reducing security risks}.
+A system is more secure if resources are invested in its security: money, time, knowledge, people, procedures, and security policies.
+As we will see further, security risks for a system increase to the extent that there are more ways to access it, equivalent to the number of gates in a fortress or weak walls.
+Reducing the number of system entries and verifying these entries are essential ways to increase its security.
+Unfortunately, the interconnection of systems and access of all kinds of devices to the Internet means that they have "entries" through the Internet and can be attacked remotely, a frequent practice of attackers nowadays.
+This is one reason why Internet of Things technologies are continuously concerned with security, as we will specify in \labelindexref{Section}{sec:embed:iot}.
+
+Next, we will detail the essential concepts related to computer security.
+Although we focus on the security of a system/device, the concepts apply to areas throughout the IT\abbrev{IT}{Information Technology} world, such as web application security, cloud security, or network security. 
