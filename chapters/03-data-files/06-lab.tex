@@ -1,0 +1,163 @@
+\newpage
+
+\section{Practical exercises}
+
+\subsection{File System Navigation}
+
+In this exercise, you will practice navigating the file system hierarchy and understanding the difference between absolute and relative paths.
+
+First, create a simple directory structure to work with:
+
+\begin{lstlisting}[style=bashstyle]
+$ mkdir -p ~/file-system-lab/{documents,media,projects}
+$ cd ~/file-system-lab
+$ touch documents/report.txt media/photo.jpg projects/script.sh
+\end{lstlisting}
+
+Now practice using different path types:
+
+\begin{lstlisting}[style=bashstyle]
+# Display your current location
+$ pwd
+
+# Navigate using relative paths
+$ cd documents
+$ pwd
+$ cd ../media
+$ pwd
+
+# Navigate using absolute paths
+$ cd /home/student/file-system-lab/projects
+$ pwd
+
+# Practice with . and .. references
+$ cd ../../
+$ pwd
+$ ls -la
+\end{lstlisting}
+
+\textbf{Exercise}: Practice the following navigation tasks:
+\begin{itemize}
+    \item Use \cmd{pwd} to show your current location
+    \item Use \cmd{cd} with relative paths to navigate between directories
+    \item Use \cmd{cd} with absolute paths to jump to specific locations
+    \item Use \cmd{cd ..} to go up one directory level
+    \item Use \cmd{cd ~} to return to your home directory
+\end{itemize}
+
+\subsection{File Type Identification}
+
+The \cmd{file} command is essential for determining the actual type of files, regardless of their extensions.
+
+Create some test files with misleading extensions:
+
+\begin{lstlisting}[style=bashstyle]
+# Create a text file but give it a .jpg extension
+$ echo "This is actually a text file" > fake-image.jpg
+
+# Create a binary file (executable) but give it a .txt extension
+$ cp /bin/ls fake-script.txt
+
+# Create a directory but give it a .file extension
+$ mkdir fake-directory.file
+\end{lstlisting}
+
+Now use the \cmd{file} command to identify the actual types:
+
+\begin{lstlisting}[style=bashstyle]
+$ file fake-image.jpg
+$ file fake-script.txt
+$ file fake-directory.file
+$ file /bin/ls
+$ file /etc/passwd
+\end{lstlisting}
+
+\textbf{Exercise}: Practice identifying file types:
+\begin{itemize}
+    \item Use \cmd{file} to check the type of files with misleading extensions
+    \item Compare the file extension with the actual file type
+    \item Identify different types of files in your system directories
+    \item Understand the difference between text and binary files
+\end{itemize}
+
+\subsection{Path Construction and Navigation}
+
+Practice building and navigating paths using the concepts learned in the chapter.
+
+\begin{lstlisting}[style=bashstyle]
+# Start from your home directory
+$ cd ~
+
+# Create a symbolic link
+$ ln -s /usr/bin/python3 my-python
+
+# Practice path resolution
+$ ls -l my-python
+$ readlink my-python
+
+# Work with paths containing spaces
+$ mkdir "directory with spaces"
+$ cd "directory with spaces"
+$ touch "file with spaces.txt"
+$ ls -la
+\end{lstlisting}
+
+\textbf{Exercise}: Practice path construction:
+\begin{itemize}
+    \item Create symbolic links and understand how they work
+    \item Work with files and directories that have spaces in their names
+    \item Practice using \cmd{readlink} to see where symbolic links point
+    \item Understand the difference between symbolic links and regular files
+\end{itemize}
+
+\subsection{File System Hierarchy Understanding}
+
+Explore the standard Linux file system hierarchy and understand the purpose of each directory.
+
+\begin{lstlisting}[style=bashstyle]
+# Explore the root directory
+$ ls -la /
+
+# Examine system directories
+$ ls /bin | head -10
+$ ls /usr/bin | head -10
+$ ls /etc | head -10
+
+# Check your home directory structure
+$ ls -la ~
+$ echo $HOME
+\end{lstlisting}
+
+\textbf{Exercise}: Explore the file system hierarchy:
+\begin{itemize}
+    \item List the contents of the root directory (\file{/})
+    \item Examine the contents of \file{/bin}, \file{/usr/bin}, and \file{/etc}
+    \item Identify the purpose of different system directories
+    \item Understand the difference between \file{/bin} and \file{/usr/bin}
+    \item Find examples of hidden files (starting with \file{.})
+\end{itemize}
+
+\subsection{Bonus: File System Concepts}
+
+As a bonus exercise, practice the fundamental concepts covered in the chapter.
+
+\begin{lstlisting}[style=bashstyle]
+# Practice with file attributes
+$ ls -la /bin/ls
+$ ls -la /etc/passwd
+
+# Understand file metadata
+$ stat /bin/ls
+$ stat /etc/passwd
+
+# Practice with different file types
+$ file /bin/ls /etc/passwd /dev/null
+\end{lstlisting}
+
+\textbf{Bonus Exercise}: Demonstrate understanding of file system concepts:
+\begin{itemize}
+    \item Use \cmd{ls -la} to view file attributes and permissions
+    \item Use \cmd{stat} to see detailed file metadata
+    \item Identify different file types using \cmd{file}
+    \item Understand the relationship between file extensions and actual file types
+\end{itemize}
