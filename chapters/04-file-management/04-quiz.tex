@@ -1,0 +1,96 @@
+\section{Post-lecture Quiz}
+\label{sec:file-mgmt:post-quiz}
+
+\subsection{Quiz Questions}
+
+\textbf{Question 1:} What is the main advantage of using the `find` command over the `locate` command for file searching?
+
+\begin{enumerate}
+    \item[A)] `find` is always faster than `locate`
+    \item[B)] \textbf{`find` searches in real-time and can use complex criteria, while `locate` uses a pre-built database}
+    \item[C)] `find` only works on local files, `locate` works on network files
+    \item[D)] `find` requires less disk space than `locate`
+\end{enumerate}
+
+\textbf{Question 2:} When creating a tar archive with gzip compression, which option combination should be used?
+
+\begin{enumerate}
+    \item[A)] `tar -cvf`
+    \item[B)] \textbf{`tar -czvf`}
+    \item[C)] `tar -xvf`
+    \item[D)] `tar -tvf`
+\end{enumerate}
+
+\textbf{Question 3:} What is the primary purpose of the `rsync` command?
+
+\begin{enumerate}
+    \item[A)] To compress files
+    \item[B)] \textbf{To synchronize files and directories between locations efficiently}
+    \item[C)] To encrypt files
+    \item[D)] To create symbolic links
+\end{enumerate}
+
+\textbf{Question 4:} In the context of standard I/O redirection, what does the `2>\&1` operator do?
+
+\begin{enumerate}
+    \item[A)] It redirects input to a file
+    \item[B)] \textbf{It redirects standard error (stderr) to standard output (stdout)}
+    \item[C)] It creates a backup of a file
+    \item[D)] It compares two files
+\end{enumerate}
+
+\textbf{Question 5:} What is the main difference between FAT32 and NTFS file systems?
+
+\begin{enumerate}
+    \item[A)] FAT32 is faster than NTFS
+    \item[B)] \textbf{FAT32 has limitations like 4GB file size limit, while NTFS supports larger files and has built-in security features}
+    \item[C)] FAT32 only works on Windows, NTFS works on all systems
+    \item[D)] There is no difference between them
+\end{enumerate}
+
+\textbf{Question 6:} What is the purpose of journaling in file systems like ext3/ext4?
+
+\begin{enumerate}
+    \item[A)] To increase file access speed
+    \item[B)] \textbf{To maintain file system consistency and enable recovery after crashes}
+    \item[C)] To compress files automatically
+    \item[D)] To encrypt file contents
+\end{enumerate}
+
+\textbf{Question 7:} When using the `dd` command, what do the `if` and `of` parameters represent?
+
+\begin{enumerate}
+    \item[A)] `if` means "if condition", `of` means "output file"
+    \item[B)] \textbf{`if` means "input file", `of` means "output file"}
+    \item[C)] `if` means "input format", `of` means "output format"
+    \item[D)] `if` means "input filter", `of` means "output filter"
+\end{enumerate}
+
+\textbf{Question 8:} What is the primary advantage of using pipes (`|`) in command line operations?
+
+\begin{enumerate}
+    \item[A)] They make commands run faster
+    \item[B)] \textbf{They allow the output of one command to be used as input for another command}
+    \item[C)] They automatically save command output to files
+    \item[D)] They encrypt command output
+\end{enumerate}
+
+\subsection{Answer Key}
+
+\begin{enumerate}
+    \item \textbf{B} - The `find` command searches the file system in real-time and can use complex search criteria, while `locate` uses a pre-built database that needs to be updated regularly but is faster for simple searches.
+    
+    \item \textbf{B} - The `tar -czvf` combination creates (`-c`) a tar archive with gzip compression (`-z`), shows verbose output (`-v`), and specifies the filename (`-f`).
+    
+    \item \textbf{B} - The `rsync` command efficiently synchronizes files and directories between locations, only transferring changed data and supporting various options for backup and synchronization tasks.
+    
+    \item \textbf{B} - The `2>\&1` operator redirects standard error (file descriptor 2) to standard output (file descriptor 1), allowing both normal output and error messages to be captured together.
+    
+    \item \textbf{B} - FAT32 has limitations like a 4GB maximum file size and 2TB maximum volume size, while NTFS supports much larger files and volumes, includes built-in security features, and supports journaling.
+    
+    \item \textbf{B} - Journaling in file systems like ext3/ext4 maintains a log of changes before they are committed, enabling the file system to recover to a consistent state after unexpected shutdowns or crashes.
+    
+    \item \textbf{B} - In the `dd` command, `if` specifies the input file (source) and `of` specifies the output file (destination), making it useful for copying files or entire disk images.
+    
+    \item \textbf{B} - Pipes (`|`) allow the output of one command to be passed directly as input to another command, enabling powerful command chaining and data processing workflows.
+\end{enumerate}

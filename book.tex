@@ -5,12 +5,14 @@
 \usepackage[colorlinks=true, linkcolor=blue, urlcolor=blue, citecolor=blue]{hyperref}
 \usepackage{graphicx}
 \usepackage{wrapfig}
+\usepackage{subcaption}
 \usepackage{import}
 \usepackage{cite}
 \usepackage[english]{babel}
 \usepackage{xcolor}
 \usepackage{listings}
 \usepackage{amsfonts}
+\usepackage{svg}
 
 % define colors for IPython syntax highlighting
 \definecolor{codebackground}{RGB}{240, 240, 240}
@@ -52,6 +54,15 @@
     numberstyle=\tiny\color{black}   % Line number styling
 }
 
+% Custom command definitions for chapter 12-auth
+\newcommand{\cmd}[1]{\texttt{#1}}
+\newcommand{\file}[1]{\texttt{#1}}
+\newcommand{\abbrev}[2]{#1\footnote{#2}}
+\newcommand{\labelindexref}[2]{#1~\ref{#2}}
+
+% Custom environment for screen listings
+\lstnewenvironment{screen}[1][]{\lstset{#1}}{}
+
 % tile, subtitle, author
 \title{\Huge \textbf{Technological Foundations in Computer Science
                      and Security Controls} \\
@@ -71,10 +82,13 @@
     \tableofcontents
 
     % chapter content
+    \includefrom{chapters/03-data-files}{main}
+    \includefrom{chapters/04-file-management}{main}
     \includefrom{chapters/05-data-versioning}{main}
     \includefrom{chapters/06-data-processing}{main}
     \includefrom{chapters/10-security-fundamentals}{main}
     \includefrom{chapters/11-integrity-confidentiality}{main}
+    \includefrom{chapters/12-auth}{main}
 
     % bibliography
     \bibliographystyle{ieeetr}

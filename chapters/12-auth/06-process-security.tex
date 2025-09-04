@@ -1,0 +1,67 @@
+\section{Process Security}
+\label{sec:sec:process}
+
+A user uses a system's resources (hardware, files, services) with the help of processes.
+Similarly, an attacker who wants to abuse a system (control it, steal information, or affect its operation) will want to capture processes.
+A direct way to capture a process is for the attacker to obtain access credentials and impersonate a valid user in the system, obtaining their permissions, as we described in \labelindexref{Section}{sec:sec:auth}.
+Another way is by exploiting process vulnerabilities and thus capturing the process.
+Another way is by tricking the user into installing applications created by the attacker that start processes that abuse systems.
+These malicious applications are called \textbf{malware}: viruses, trojans, worms (\textit{worms}), spyware are examples of malware.
+
+In any of the above variants, the operating system must consider preventive measures and reactive measures for protecting processes.
+
+Preventive measures aim to prevent an attacker from being able to reach processes in the system.
+These measures can be:
+
+\begin{itemize}
+  \item system access security (described in \labelindexref{Section}{sec:sec:auth})
+  \item specialized techniques (such as memory protection) that prevent exploitation of vulnerabilities
+  \item verification of installed applications (using summaries/checksums) and verification of the source of origin.
+    This is very important especially in the case of mobile devices where online application stores (\textit{online application stores}) such as Apple AppStore or Google Play store many applications.
+\end{itemize}
+
+Reactive measures assume that the attack has occurred or will occur and aim to limit the damages caused by an attack.
+Such measures are: placing the contaminated process in quarantine, investigating the attack and detecting the problem, updating the vulnerable application (\textit{update}, \textit{patching}) or removing the vulnerable application.
+
+Reactive measures must be taken as quickly as possible after an attack occurs to limit damages.
+That is why \textbf{process monitoring} and system resources is important.
+A technical user or system or network administrator will use specific application suites for monitoring and will detect abnormal behaviors that may be the effects of an attack and will react quickly.
+In the absence of monitoring, an attacker will have more time to obtain benefits from the attack or will be able to extend the attack to other systems or resources.
+Monitoring has the role of detecting both attacks and resource abuse or unusual behaviors due to inappropriate (but unintentionally abusive) system usage.
+For example, antivirus systems periodically monitor the file system to detect the presence of infected files.
+Utilities such as Fail2ban\footnote{\url{https://www.fail2ban.org/wiki/index.php/Main\_Page}} monitor log files to detect and block invalid access attempts in the system.
+Complex systems such as Nagios\footnote{\url{https://www.nagios.org/}} monitor an organization's IT infrastructure: network, applications, hardware resources.
+
+For preventing damages caused by a compromised process, it is essential to respect the principle of least privilege, described in \labelindexref{Section}{sec:sec:fundamentals:principles}.
+This assumes that a process has access only to the resources it needs: files, interaction with other processes, hardware resources.
+
+A first way of implementing the principle of least privilege is represented by file system access permissions.
+A process will be able to access only those files to which the user to whom the process belongs has access.
+Thus, a process of an unprivileged user will be able to write only in their own home directory, will be able to only read the file \file{/etc/passwd} and will have no form of access to the file \file{/etc/shadow}.
+
+An additional measure is using jailing mechanisms of the chroot type, as we described in \labelindexref{Section}{sec:sec:data:fs}.
+With such a mechanism, a process will be able to access only files from a part of the file system hierarchy.
+
+Chroot-type mechanisms are \textbf{process isolation} mechanisms.
+With the help of chroot, we isolate the process's access to the file system.
+To extend isolation to other areas (communication with other processes, network access, hardware access), we can use \textbf{sandboxing}.
+Sandboxing involves creating resource access rules and attaching those rules to a process;
+the process will be able to access only the resources permitted in those rules.
+Sandboxing is implemented in operating systems on mobile devices (Android, iOS) to limit potential damages created by applications installed by a user on the mobile device.
+
+An extended form of isolation is \textbf{using containers or virtual machines}, described in \labelindexref{Chapter}{ch:vm}.
+Containers offer complex isolation rules for an application or a set of applications, thus extending the sandboxing mechanism.
+Virtual machines add, compared to containers, hardware resource partitioning and isolation including the virtual machine's operating system;
+in case of a compromised operating system, only the respective virtual machine will be affected.
+
+The presence of isolation methods leads to diminishing damages caused by a potential attack.
+But isolating a process limits its range of actions.
+It is possible that a process may need, at some point, a privileged action that cannot be performed according to isolation rules.
+For this action, privilege escalation (\textit{privilege escalation}) is needed, that is, obtaining (temporary) privileges that allow the action.
+
+In Linux, the classic form of privilege escalation is marking an executable with the \textit{set-user-ID-on-execution} bit (also called \textit{setuid}).
+A configurable form of privilege escalation is with the help of the \cmd{sudo} utility.
+We detailed the setuid bit and the \cmd{sudo} utility in \labelindexref{Section}{sec:user:altroot}.
+
+Since processes are the way of using the system and accessing its resources, we must consider their security through preventive measures and reactive measures.
+It is important to be careful about what applications we install on our systems and devices and to use applications that monitor system operation and resource usage. 

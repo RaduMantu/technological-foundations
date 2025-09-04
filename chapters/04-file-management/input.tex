@@ -1,0 +1,511 @@
+\label{ch:file-mgmt}
+
+The file system provides utilities for performing common operations with files: creation, deletion, renaming, searching, displaying content, modifying content.
+These operations are common to all operating systems and file systems.
+
+\section{Common File and Directory Operations}
+\label{sec:file-mgmt:file-ops}
+
+The file system allows us to perform several types of operations on files.
+Common operations on files include: displaying and changing the directory, displaying file content, listing files in a directory, creating files or directories, copying, moving, renaming or deleting them, as well as archiving/unarchiving and creating a backup version.
+
+\subsection{Displaying and Changing Directory}
+\label{sec:file-mgmt:dir-ops}
+
+To know where we are in the file system hierarchy, we use the \cmd{pwd} command (\textit{print working directory}).
+This command displays the absolute path of the current directory.
+
+\begin{screen}[style=bashstyle]
+$ pwd
+/home/student
+\end{screen}
+
+To change the current directory, we use the \cmd{cd} command (\textit{change directory}).
+This command allows us to navigate through the file system hierarchy.
+
+\begin{screen}[style=bashstyle]
+$ cd /home/student/Documents
+$ pwd
+/home/student/Documents
+\end{screen}
+
+Some useful shortcuts for the \cmd{cd} command:
+\begin{itemize}
+  \item \cmd{cd} or \cmd{cd \textasciitilde{}} - goes to the home directory
+  \item \cmd{cd -} - goes to the previous directory
+  \item \cmd{cd ..} - goes to the parent directory
+  \item \cmd{cd .} - stays in the current directory
+\end{itemize}
+
+\subsection{Listing Files and Directories}
+\label{sec:file-mgmt:listing}
+
+The \cmd{ls} command (\textit{list}) displays the contents of a directory.
+Without arguments, it shows the files and directories in the current directory.
+
+\begin{screen}[style=bashstyle]
+$ ls
+Documents  Downloads  Pictures  Music  Videos
+\end{screen}
+
+Common options for the \cmd{ls} command:
+\begin{itemize}
+  \item \cmd{ls -l} - displays detailed information (permissions, owner, size, date)
+  \item \cmd{ls -a} - shows hidden files (starting with a dot)
+  \item \cmd{ls -h} - displays file sizes in human-readable format
+  \item \cmd{ls -R} - recursively lists subdirectories
+  \item \cmd{ls -t} - sorts by modification time
+  \item \cmd{ls -S} - sorts by file size
+\end{itemize}
+
+\begin{screen}[style=bashstyle]
+$ ls -la
+total 48
+drwxr-xr-x 15 student student 4096 aug 24 14:52 .
+drwxr-xr-x  3 root    root    4096 aug 20 10:15 ..
+-rw-r--r--  1 student student  220 aug 24 14:52 .bashrc
+-rw-r--r--  1 student student  807 aug 24 14:52 .profile
+drwxr-xr-x  2 student student 4096 aug 24 14:52 Documents
+drwxr-xr-x  2 student student 4096 aug 24 14:52 Downloads
+\end{screen}
+
+\subsection{Displaying File Content}
+\label{sec:file-mgmt:display}
+
+The \cmd{cat} command (\textit{concatenate}) displays the entire content of one or more files.
+
+\begin{screen}[style=bashstyle]
+$ cat file.txt
+This is the content of the file.
+It can span multiple lines.
+\end{screen}
+
+The \cmd{less} command allows us to view file content page by page, with the ability to scroll up and down.
+This is useful for large files.
+
+\begin{screen}[style=bashstyle]
+$ less large_file.txt
+\end{screen}
+
+Navigation in \cmd{less}:
+\begin{itemize}
+  \item \textbf{Space} - next page
+  \item \textbf{b} - previous page
+  \item \textbf{q} - quit
+  \item \textbf{/} - search forward
+  \item \textbf{?} - search backward
+\end{itemize}
+
+\subsection{Creating Files and Directories}
+\label{sec:file-mgmt:creation}
+
+The \cmd{touch} command creates an empty file or updates the modification time of an existing file.
+
+\begin{screen}[style=bashstyle]
+$ touch new_file.txt
+$ ls -l new_file.txt
+-rw-r--r-- 1 student student 0 aug 24 15:30 new_file.txt
+\end{screen}
+
+The \cmd{mkdir} command (\textit{make directory}) creates a new directory.
+
+\begin{screen}[style=bashstyle]
+$ mkdir new_directory
+$ ls -ld new_directory
+drwxr-xr-x 2 student student 4096 aug 24 15:32 new_directory
+\end{screen}
+
+The \cmd{mkdir -p} option creates parent directories if they don't exist.
+
+\begin{screen}[style=bashstyle]
+$ mkdir -p path/to/new/directory
+\end{screen}
+
+\subsection{File Manipulation}
+\label{sec:file-mgmt:manipulation}
+
+\subsubsection{Copying Files and Directories}
+
+The \cmd{cp} command (\textit{copy}) copies files or directories.
+
+\begin{screen}[style=bashstyle]
+$ cp file.txt file_copy.txt
+$ cp -r directory/ directory_copy/
+\end{screen}
+
+Common options:
+\begin{itemize}
+  \item \cmd{cp -r} - recursively copy directories
+  \item \cmd{cp -i} - interactive mode (asks before overwriting)
+  \item \cmd{cp -v} - verbose mode (shows what is being copied)
+\end{itemize}
+
+\subsubsection{Moving and Renaming}
+
+The \cmd{mv} command (\textit{move}) moves or renames files and directories.
+
+\begin{screen}[style=bashstyle]
+$ mv old_name.txt new_name.txt
+$ mv file.txt /home/student/Documents/
+\end{screen}
+
+\subsubsection{Deleting Files and Directories}
+
+The \cmd{rm} command (\textit{remove}) deletes files.
+
+\begin{screen}[style=bashstyle]
+$ rm file.txt
+$ rm -r directory/
+$ rm -f file.txt  # force deletion without confirmation
+\end{screen}
+
+The \cmd{rmdir} command deletes empty directories.
+
+\begin{screen}[style=bashstyle]
+$ rmdir empty_directory
+\end{screen}
+
+\subsubsection{Creating Symbolic Links}
+
+The \cmd{ln -s} command creates symbolic links (shortcuts).
+
+\begin{screen}[style=bashstyle]
+$ ln -s /path/to/original/file link_name
+$ ls -l link_name
+lrwxrwxrwx 1 student student 20 aug 24 15:45 link_name -> /path/to/original/file
+\end{screen}
+
+\section{File Searching}
+\label{sec:file-mgmt:searching}
+
+\subsection{Indexed Search}
+
+The \cmd{locate} command searches for files using a pre-built database.
+This is very fast but requires the database to be updated regularly.
+
+\begin{screen}[style=bashstyle]
+$ locate filename
+$ sudo updatedb  # update the database
+\end{screen}
+
+\subsection{Exhaustive Search}
+
+The \cmd{find} command searches for files by traversing the directory tree.
+This is more thorough but slower than \cmd{locate}.
+
+\begin{screen}[style=bashstyle]
+$ find /home/student -name "*.txt"
+$ find /home/student -type f -name "*.pdf"
+$ find /home/student -size +10M
+\end{screen}
+
+Common \cmd{find} options:
+\begin{itemize}
+  \item \cmd{-name} - search by filename
+  \item \cmd{-type f} - search for files only
+  \item \cmd{-type d} - search for directories only
+  \item \cmd{-size +10M} - files larger than 10MB
+  \item \cmd{-mtime -7} - files modified in the last 7 days
+\end{itemize}
+
+\subsection{Command Search}
+
+The \cmd{whereis} command locates binary, source, and manual page files for a command.
+
+\begin{screen}[style=bashstyle]
+$ whereis ls
+ls: /bin/ls /usr/share/man/man1/ls.1.gz
+\end{screen}
+
+The \cmd{which} command shows the full path of shell commands.
+
+\begin{screen}[style=bashstyle]
+$ which python
+/usr/bin/python
+\end{screen}
+
+The \cmd{type} command shows how a command name is interpreted.
+
+\begin{screen}[style=bashstyle]
+$ type ls
+ls is aliased to `ls --color=auto'
+\end{screen}
+
+\section{Archiving and Compression}
+\label{sec:file-mgmt:archiving}
+
+\subsection{The tar Command}
+
+The \cmd{tar} command (\textit{tape archive}) is used to create and extract archives.
+
+Creating an archive:
+\begin{screen}[style=bashstyle]
+$ tar -cvf archive.tar file1 file2 directory/
+$ tar -czvf archive.tar.gz file1 file2 directory/  # with gzip compression
+$ tar -cjvf archive.tar.bz2 file1 file2 directory/  # with bzip2 compression
+\end{screen}
+
+Extracting an archive:
+\begin{screen}[style=bashstyle]
+$ tar -xvf archive.tar
+$ tar -xzvf archive.tar.gz
+$ tar -xjvf archive.tar.bz2
+\end{screen}
+
+Listing archive contents:
+\begin{screen}[style=bashstyle]
+$ tar -tvf archive.tar
+$ tar -tzvf archive.tar.gz
+\end{screen}
+
+Common \cmd{tar} options:
+\begin{itemize}
+  \item \cmd{-c} - create archive
+  \item \cmd{-x} - extract archive
+  \item \cmd{-t} - list archive contents
+  \item \cmd{-v} - verbose mode
+  \item \cmd{-f} - specify archive file
+  \item \cmd{-z} - use gzip compression
+  \item \cmd{-j} - use bzip2 compression
+\end{itemize}
+
+\subsection{Compression Tools}
+
+\cmd{gzip} compresses files using the gzip algorithm.
+
+\begin{screen}[style=bashstyle]
+$ gzip file.txt
+$ gunzip file.txt.gz
+\end{screen}
+
+\cmd{bzip2} provides better compression than gzip but is slower.
+
+\begin{screen}[style=bashstyle]
+$ bzip2 file.txt
+$ bunzip2 file.txt.bz2
+\end{screen}
+
+\section{Backup Methods}
+\label{sec:file-mgmt:backup}
+
+\subsection{tar with Compression}
+
+A common backup method is to create compressed tar archives.
+
+\begin{screen}[style=bashstyle]
+$ tar -czf backup_$(date +%Y%m%d).tar.gz /home/student/Documents/
+\end{screen}
+
+\subsection{dd Command}
+
+The \cmd{dd} command (\textit{data duplicator}) can create exact copies of files or entire disks.
+
+\begin{screen}[style=bashstyle]
+$ dd if=/dev/sda of=/dev/sdb bs=4M  # clone entire disk
+$ dd if=file.txt of=file_copy.txt   # copy file
+\end{screen}
+
+\subsection{rsync Command}
+
+The \cmd{rsync} command synchronizes files and directories between locations.
+
+\begin{screen}[style=bashstyle]
+$ rsync -av /source/ /destination/
+$ rsync -av --delete /source/ /destination/  # delete files not in source
+\end{screen}
+
+\subsection{rdiff-backup}
+
+The \cmd{rdiff-backup} command provides incremental backups with space-efficient storage.
+
+\begin{screen}[style=bashstyle]
+$ rdiff-backup /source/ /backup/
+\end{screen}
+
+\section{Standard I/O Redirection}
+\label{sec:file-mgmt:io-redirection}
+
+In Unix-like systems, there are three standard streams:
+\begin{itemize}
+  \item \textbf{stdin} (0) - standard input
+  \item \textbf{stdout} (1) - standard output
+  \item \textbf{stderr} (2) - standard error
+\end{itemize}
+
+\subsection{Output Redirection}
+
+The \cmd{>} operator redirects stdout to a file (overwrites).
+
+\begin{screen}[style=bashstyle]
+$ ls > file_list.txt
+$ echo "Hello World" > greeting.txt
+\end{screen}
+
+The \cmd{>>} operator appends stdout to a file.
+
+\begin{screen}[style=bashstyle]
+$ echo "New line" >> file.txt
+\end{screen}
+
+\subsection{Input Redirection}
+
+The \cmd{<} operator redirects input from a file.
+
+\begin{screen}[style=bashstyle]
+$ sort < unsorted.txt > sorted.txt
+\end{screen}
+
+\subsection{Error Redirection}
+
+The \cmd{2>} operator redirects stderr to a file.
+
+\begin{screen}[style=bashstyle]
+$ command 2> error.log
+$ command 2>&1  # redirect stderr to stdout
+\end{screen}
+
+\subsection{Pipes}
+
+The \cmd{|} operator pipes the output of one command to the input of another.
+
+\begin{screen}[style=bashstyle]
+$ ls -l | grep ".txt"
+$ ps aux | grep firefox
+$ cat file.txt | sort | uniq
+\end{screen}
+
+\section{File System Types}
+\label{sec:file-mgmt:fs-types}
+
+\subsection{Physical File Systems}
+
+Physical file systems are stored on actual storage devices.
+
+\textbf{FAT32}: A simple file system used on USB drives and older Windows systems.
+\begin{itemize}
+  \item Maximum file size: 4GB
+  \item Maximum volume size: 2TB
+  \item No built-in security features
+\end{itemize}
+
+\textbf{NTFS}: The default file system for modern Windows systems.
+\begin{itemize}
+  \item Supports large files and volumes
+  \item Built-in security and permissions
+  \item Journaling support
+\end{itemize}
+
+\textbf{Ext2/3/4}: File systems commonly used on Linux systems.
+\begin{itemize}
+  \item Ext2: Basic file system without journaling
+  \item Ext3: Ext2 with journaling
+  \item Ext4: Improved version with better performance
+\end{itemize}
+
+\textbf{HFS+}: The file system used on older macOS systems.
+\begin{itemize}
+  \item Supports large files and volumes
+  \item Built-in compression and encryption
+\end{itemize}
+
+\textbf{APFS}: The modern file system for macOS and iOS.
+\begin{itemize}
+  \item Optimized for solid-state drives
+  \item Built-in encryption and snapshots
+  \item Space sharing between volumes
+\end{itemize}
+
+\subsection{Virtual File Systems}
+
+Virtual file systems don't correspond to physical storage.
+
+\textbf{procfs}: Provides information about running processes and system information.
+\begin{screen}[style=bashstyle]
+$ ls /proc/
+$ cat /proc/cpuinfo
+$ cat /proc/meminfo
+\end{screen}
+
+\textbf{devfs}: Provides access to device files.
+\begin{screen}[style=bashstyle]
+$ ls /dev/
+$ ls /dev/sd*  # SATA/SCSI devices
+$ ls /dev/tty* # terminal devices
+\end{screen}
+
+\textbf{SSHFS}: Allows mounting remote file systems over SSH.
+\begin{screen}[style=bashstyle]
+$ sshfs user@remote:/path/to/directory /local/mount/point
+\end{screen}
+
+\subsection{Network File Systems}
+
+Network file systems allow access to files over a network.
+
+\textbf{NFS} (\textit{Network File System}): Allows sharing files between Unix-like systems.
+\begin{screen}[style=bashstyle]
+$ mount -t nfs server:/exported/path /local/mount/point
+\end{screen}
+
+\textbf{SMB/CIFS}: Used for file sharing with Windows systems.
+\begin{screen}[style=bashstyle]
+$ mount -t cifs //server/share /local/mount/point
+\end{screen}
+
+\section{Data Integrity}
+\label{sec:file-mgmt:integrity}
+
+\subsection{Checksums}
+
+Checksums are used to verify data integrity.
+
+The \cmd{md5sum} command calculates MD5 checksums.
+
+\begin{screen}[style=bashstyle]
+$ md5sum file.txt
+d41d8cd98f00b204e9800998ecf8427e  file.txt
+\end{screen}
+
+The \cmd{sha256sum} command calculates SHA-256 checksums.
+
+\begin{screen}[style=bashstyle]
+$ sha256sum file.txt
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  file.txt
+\end{screen}
+
+\subsection{Journaling}
+
+Journaling file systems maintain a log of changes to ensure consistency after crashes.
+
+\textbf{Ext3/4}: Uses journaling to prevent file system corruption.
+\begin{itemize}
+  \item Metadata journaling: logs only metadata changes
+  \item Full journaling: logs all changes
+  \item Ordered mode: writes data before metadata
+\end{itemize}
+
+\textbf{NTFS}: Uses a transaction log for consistency.
+\begin{itemize}
+  \item Automatic recovery after crashes
+  \item Prevents data loss during power failures
+\end{itemize}
+
+\section{Summary}
+\label{sec:file-mgmt:summary}
+
+File management and access control are fundamental aspects of operating systems.
+This chapter covered:
+
+\begin{itemize}
+  \item Common file and directory operations (pwd, cd, ls, cat, less, touch, mkdir)
+  \item File manipulation commands (cp, mv, rm, ln)
+  \item File searching tools (find, locate, whereis, which, type)
+  \item Archiving and compression (tar, gzip, bzip2)
+  \item Backup methods (tar, dd, rsync, rdiff-backup)
+  \item Standard I/O redirection and pipes
+  \item Different types of file systems (physical, virtual, network)
+  \item Data integrity concepts (checksums, journaling)
+\end{itemize}
+
+These concepts are essential for effective system administration and file management in any Unix-like environment.
+Understanding file operations, permissions, and file system types is crucial for maintaining data integrity and system security.

@@ -1,0 +1,236 @@
+\newpage
+
+\section{Practical exercises}
+
+\subsection{User and Permission Management}
+
+In this exercise, you will practice working with file permissions and understanding access control concepts.
+
+First, create a test environment:
+
+\begin{lstlisting}[style=bashstyle]
+# Create test files and directories
+$ mkdir -p ~/security-lab/{shared,private,group-only}
+$ touch ~/security-lab/shared/public-file.txt
+$ touch ~/security-lab/private/secret-file.txt
+$ touch ~/security-lab/group-only/team-file.txt
+
+# Set different permission levels
+$ chmod 755 ~/security-lab/shared
+$ chmod 700 ~/security-lab/private
+$ chmod 750 ~/security-lab/group-only
+
+# Set file permissions
+$ chmod 644 ~/security-lab/shared/public-file.txt
+$ chmod 600 ~/security-lab/private/secret-file.txt
+$ chmod 640 ~/security-lab/group-only/team-file.txt
+\end{lstlisting}
+
+Practice viewing and understanding permissions:
+
+\begin{lstlisting}[style=bashstyle]
+# View file permissions
+$ ls -la ~/security-lab/
+$ ls -la ~/security-lab/shared/
+$ ls -la ~/security-lab/private/
+$ ls -la ~/security-lab/group-only/
+
+# Understand permission notation
+$ stat ~/security-lab/shared/public-file.txt
+$ stat ~/security-lab/private/secret-file.txt
+\end{lstlisting}
+
+\textbf{Exercise}: Practice permission management:
+\begin{itemize}
+    \item Use \cmd{chmod} to change file and directory permissions
+    \item Use \cmd{ls -la} to view permission information
+    \item Use \cmd{stat} to see detailed permission information
+    \item Understand the difference between read, write, and execute permissions
+    \item Practice with different permission combinations (755, 644, 600, etc.)
+\end{itemize}
+
+\subsection{SSH and Remote Access}
+
+Practice working with SSH keys and understanding secure remote access concepts.
+
+Generate SSH key pairs:
+
+\begin{lstlisting}[style=bashstyle]
+# Generate SSH key pair
+$ ssh-keygen -t ed25519 -C "student@example.com"
+
+# View public key
+$ cat ~/.ssh/id_ed25519.pub
+
+# View private key (be careful with this)
+$ ls -la ~/.ssh/
+\end{lstlisting}
+
+Practice SSH configuration:
+
+\begin{lstlisting}[style=bashstyle]
+# Create SSH config file
+$ mkdir -p ~/.ssh
+$ cat > ~/.ssh/config << EOF
+Host myserver
+    HostName 192.168.1.100
+    User student
+    Port 22
+    IdentityFile ~/.ssh/id_ed25519
+EOF
+
+# Set proper permissions
+$ chmod 600 ~/.ssh/config
+$ chmod 600 ~/.ssh/id_*
+$ chmod 644 ~/.ssh/id_*.pub
+\end{lstlisting}
+
+\textbf{Exercise}: Practice SSH concepts:
+\begin{itemize}
+    \item Use \cmd{ssh-keygen} to generate SSH key pairs
+    \item Understand the difference between public and private keys
+    \item Use \cmd{chmod} to set proper permissions on SSH files
+    \item Understand SSH configuration file format
+    \item Practice viewing SSH key fingerprints
+\end{itemize}
+
+\subsection{System Monitoring and Logs}
+
+Practice monitoring system processes and understanding log files.
+
+Monitor system processes:
+
+\begin{lstlisting}[style=bashstyle]
+# View running processes
+$ ps aux | head -20
+$ ps aux | grep ssh
+
+# Monitor system resources
+$ free -h
+$ df -h
+
+# Check network connections
+$ netstat -tuln | grep :22
+$ ss -tuln | grep :22
+\end{lstlisting}
+
+Analyze system logs:
+
+\begin{lstlisting}[style=bashstyle]
+# Check authentication logs (if accessible)
+$ sudo tail -20 /var/log/auth.log
+$ sudo grep "Failed password" /var/log/auth.log
+
+# Check system logs
+$ sudo journalctl -u ssh
+$ sudo journalctl --since "1 hour ago"
+\end{lstlisting}
+
+\textbf{Exercise}: Practice system monitoring:
+\begin{itemize}
+    \item Use \cmd{ps} to view running processes
+    \item Use \cmd{free} and \cmd{df} to monitor system resources
+    \item Use \cmd{netstat} and \cmd{ss} to check network connections
+    \item Use \cmd{journalctl} to view system logs
+    \item Understand the importance of log monitoring for security
+\end{itemize}
+
+\subsection{Security Hardening}
+
+Practice implementing basic security measures and understanding security concepts.
+
+Check system security status:
+
+\begin{lstlisting}[style=bashstyle]
+# Check current firewall status
+$ sudo ufw status
+$ sudo iptables -L
+
+# Check system information
+$ uname -a
+$ whoami
+$ id
+\end{lstlisting}
+
+Practice with file permissions:
+
+\begin{lstlisting}[style=bashstyle]
+# Create test files with different permissions
+$ touch test-file.txt
+$ chmod 755 test-file.txt
+$ ls -l test-file.txt
+
+# Practice with directory permissions
+$ mkdir test-dir
+$ chmod 700 test-dir
+$ ls -ld test-dir
+\end{lstlisting}
+
+\textbf{Exercise}: Practice security hardening concepts:
+\begin{itemize}
+    \item Use \cmd{ufw} to check firewall status
+    \item Use \cmd{iptables} to view firewall rules
+    \item Use \cmd{chmod} to set secure file permissions
+    \item Understand the principle of least privilege
+    \item Practice with different permission combinations for security
+\end{itemize}
+
+\subsection{Network Security}
+
+Practice network security concepts and tools.
+
+Analyze network connections:
+
+\begin{lstlisting}[style=bashstyle]
+# Monitor network connections
+$ netstat -an | grep :22
+$ ss -tuln | grep :22
+
+# Check for listening services
+$ sudo netstat -tlnp
+$ sudo ss -tlnp
+\end{lstlisting}
+
+Test network connectivity:
+
+\begin{lstlisting}[style=bashstyle]
+# Test port connectivity
+$ telnet localhost 22
+$ nc -zv localhost 22
+\end{lstlisting}
+
+\textbf{Exercise}: Practice network security concepts:
+\begin{itemize}
+    \item Use \cmd{netstat} and \cmd{ss} to monitor network connections
+    \item Use \cmd{telnet} and \cmd{nc} to test network connectivity
+    \item Understand the importance of monitoring network services
+    \item Practice identifying listening ports and services
+    \item Understand basic network security principles
+\end{itemize}
+
+\subsection{Bonus: Security Concepts}
+
+As a bonus exercise, practice the fundamental security concepts covered in the chapter.
+
+\begin{lstlisting}[style=bashstyle]
+# Practice with system information
+$ uname -a
+$ cat /etc/os-release
+$ whoami
+$ id
+$ groups
+
+# Practice with file security
+$ ls -la /etc/passwd
+$ ls -la /etc/shadow
+$ ls -la /bin/ls
+\end{lstlisting}
+
+\textbf{Bonus Exercise}: Demonstrate understanding of security concepts:
+\begin{itemize}
+    \item Use \cmd{uname} to get system information
+    \item Use \cmd{whoami} and \cmd{id} to understand user identity
+    \item Use \cmd{groups} to see user group memberships
+    \item Understand the importance of file permissions for system security
+    \item Practice identifying security-sensitive files and their permissions
+\end{itemize}

@@ -1,0 +1,256 @@
+\newpage
+
+\section{Practical exercises}
+
+\subsection{File Operations Mastery}
+
+In this exercise, you will practice essential file and directory operations using the commands covered in the chapter.
+
+First, create a working directory and some test files:
+
+\begin{lstlisting}[style=bashstyle]
+$ mkdir -p ~/file-ops-lab/{source,backup,archive}
+$ cd ~/file-ops-lab
+$ touch source/{file1.txt,file2.txt,file3.txt}
+$ echo "Hello World" > source/file1.txt
+$ echo "This is file 2" > source/file2.txt
+$ echo "File 3 content" > source/file3.txt
+\end{lstlisting}
+
+Practice basic file operations:
+
+\begin{lstlisting}[style=bashstyle]
+# Copy files
+$ cp source/file1.txt backup/
+$ cp -r source/ backup/source-copy/
+
+# Move and rename files
+$ mv source/file2.txt backup/file2-renamed.txt
+$ mv source/file3.txt archive/
+
+# Create symbolic and hard links
+$ ln -s source/file1.txt source-link
+$ ln source/file1.txt source-hard-link
+
+# Verify links
+$ ls -la source*
+$ readlink source-link
+\end{lstlisting}
+
+\textbf{Exercise}: Practice file operations:
+\begin{itemize}
+    \item Use \cmd{cp} to copy files and directories
+    \item Use \cmd{mv} to move and rename files
+    \item Create symbolic links with \cmd{ln -s}
+    \item Create hard links with \cmd{ln}
+    \item Use \cmd{readlink} to see where symbolic links point
+\end{itemize}
+
+\subsection{File Searching and Filtering}
+
+Practice finding files and content using the search tools covered in the chapter.
+
+Create a directory structure for searching:
+
+\begin{lstlisting}[style=bashstyle]
+$ mkdir -p ~/search-lab/{docs,code,data,logs}
+$ cd ~/search-lab
+
+# Create various file types
+$ echo "Python script content" > code/script.py
+$ echo "Configuration file" > code/config.conf
+$ echo "Log entry: ERROR 404" > logs/app.log
+$ echo "Another log: INFO startup" >> logs/app.log
+$ echo "Data file content" > data/data.txt
+$ echo "Document content" > docs/readme.txt
+\end{lstlisting}
+
+Practice different search techniques:
+
+\begin{lstlisting}[style=bashstyle]
+# Find files by name
+$ find . -name "*.py"
+$ find . -name "*.log"
+
+# Find files by type
+$ find . -type f
+$ find . -type d
+
+# Find files by size
+$ find . -size +1k
+$ find . -size -100c
+
+# Find files by modification time
+$ find . -mtime -1
+$ find . -newer code/script.py
+
+# Search file contents
+$ grep -r "ERROR" .
+$ grep -r "Python" .
+$ grep -l "content" *
+\end{lstlisting}
+
+\textbf{Exercise}: Practice file searching:
+\begin{itemize}
+    \item Use \cmd{find} to locate files by name, type, size, and date
+    \item Use \cmd{grep} to search for text within files
+    \item Use \cmd{locate} to quickly find files (if available)
+    \item Use \cmd{whereis} and \cmd{which} to find command locations
+    \item Combine search commands with other tools
+\end{itemize}
+
+\subsection{Archiving and Compression}
+
+Practice working with different archive formats and compression methods.
+
+Create files to archive:
+
+\begin{lstlisting}[style=bashstyle]
+$ mkdir -p ~/archive-lab/{project1,project2}
+$ cd ~/archive-lab
+
+# Create sample project files
+$ echo "Source code" > project1/main.c
+$ echo "Header file" > project1/header.h
+$ echo "Makefile" > project1/Makefile
+$ echo "Documentation" > project1/README.txt
+
+$ echo "Python script" > project2/script.py
+$ echo "Requirements" > project2/requirements.txt
+$ echo "Data file" > project2/data.csv
+\end{lstlisting}
+
+Practice different archiving methods:
+
+\begin{lstlisting}[style=bashstyle]
+# Create tar archives
+$ tar -cvf project1.tar project1/
+$ tar -czvf project1.tar.gz project1/
+$ tar -cjvf project1.tar.bz2 project1/
+
+# List archive contents
+$ tar -tvf project1.tar
+$ tar -tzvf project1.tar.gz
+
+# Extract archives
+$ mkdir extracted
+$ tar -xvf project1.tar -C extracted/
+$ tar -xzvf project1.tar.gz -C extracted/
+
+# Work with zip archives
+$ zip -r project2.zip project2/
+$ unzip -l project2.zip
+$ unzip project2.zip -d extracted/
+\end{lstlisting}
+
+\textbf{Exercise}: Practice archiving and compression:
+\begin{itemize}
+    \item Use \cmd{tar} to create and extract archives
+    \item Use different compression methods (gzip, bzip2)
+    \item Use \cmd{zip} and \cmd{unzip} for ZIP archives
+    \item List archive contents before extracting
+    \item Compare file sizes before and after compression
+\end{itemize}
+
+\subsection{I/O Redirection and Pipes}
+
+Practice input/output redirection and command chaining with pipes.
+
+Create test files for redirection exercises:
+
+\begin{lstlisting}[style=bashstyle]
+$ mkdir ~/io-lab
+$ cd ~/io-lab
+
+# Create sample data files
+$ echo -e "apple\nbanana\ncherry\ndate\nelderberry" > fruits.txt
+$ echo -e "1\n5\n3\n9\n2\n8\n4\n7\n6" > numbers.txt
+$ echo -e "error: file not found\ninfo: system started\nwarning: low memory\nerror: connection failed" > log.txt
+\end{lstlisting}
+
+Practice redirection and piping:
+
+\begin{lstlisting}[style=bashstyle]
+# Output redirection
+$ ls -la > file-list.txt
+$ echo "New content" >> file-list.txt
+$ ls -la 2> errors.txt
+
+# Input redirection
+$ sort < numbers.txt
+$ wc -l < fruits.txt
+
+# Pipes
+$ cat fruits.txt | sort | uniq
+$ cat log.txt | grep "error" | wc -l
+
+# Complex pipelines
+$ find . -name "*.txt" | xargs wc -l | sort -nr
+$ cat numbers.txt | sort -n | head -5
+$ cat log.txt | grep "error" | cut -d: -f2 | sort | uniq
+\end{lstlisting}
+
+\textbf{Exercise}: Practice I/O redirection and pipes:
+\begin{itemize}
+    \item Use \cmd{>} to redirect output to files
+    \item Use \cmd{>>} to append output to files
+    \item Use \cmd{<} to redirect input from files
+    \item Use \cmd{|} to pipe output between commands
+    \item Combine multiple commands with pipes
+\end{itemize}
+
+\subsection{File System Types and Data Integrity}
+
+Practice working with different file system types and data integrity concepts.
+
+\begin{lstlisting}[style=bashstyle]
+# Check file system types
+$ df -T
+$ mount | grep -E "(ext4|ntfs|fat32)"
+
+# Check data integrity with checksums
+$ echo "test content" > test-file.txt
+$ md5sum test-file.txt
+$ sha256sum test-file.txt
+
+# Compare files
+$ cp test-file.txt test-file-copy.txt
+$ diff test-file.txt test-file-copy.txt
+$ cmp test-file.txt test-file-copy.txt
+\end{lstlisting}
+
+\textbf{Exercise}: Practice file system concepts:
+\begin{itemize}
+    \item Use \cmd{df -T} to identify file system types
+    \item Use \cmd{md5sum} and \cmd{sha256sum} to verify file integrity
+    \item Use \cmd{diff} and \cmd{cmp} to compare files
+    \item Understand the difference between different file system types
+    \item Practice backup methods using \cmd{dd} and \cmd{rsync}
+\end{itemize}
+
+\subsection{Bonus: File Management Concepts}
+
+As a bonus exercise, practice the fundamental file management concepts covered in the chapter.
+
+\begin{lstlisting}[style=bashstyle]
+# Practice with file permissions
+$ touch test-file.txt
+$ chmod 755 test-file.txt
+$ ls -l test-file.txt
+
+# Practice with file attributes
+$ ls -la /bin/ls
+$ stat /bin/ls
+
+# Practice with different file types
+$ file /bin/ls /etc/passwd /dev/null
+\end{lstlisting}
+
+\textbf{Bonus Exercise}: Demonstrate understanding of file management concepts:
+\begin{itemize}
+    \item Use \cmd{chmod} to change file permissions
+    \item Use \cmd{ls -la} to view file attributes
+    \item Use \cmd{stat} to see detailed file information
+    \item Use \cmd{file} to identify file types
+    \item Understand the relationship between file operations and system security
+\end{itemize}
